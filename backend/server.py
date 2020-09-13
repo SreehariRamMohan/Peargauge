@@ -5,8 +5,12 @@ from flask_pymongo import PyMongo
 from flask import request
 from bson.objectid import ObjectId
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
+import redis
 
 app = Flask(__name__)
+
+# connect to redis cache
+r = redis.Redis(host='localhost', port=6379, db=0)
 
 # connect to the MongoDB server running on port 27017 (localhost)
 # the database we're connecting to is called myDatabase (exposed as db)
@@ -40,16 +44,43 @@ def on_guess(guess):
     letter = guess["letter"]
     roomid = guess["roomid"]
     
+    current_answers = r.get(roomid)
+
+    if(current_answers == None):
+        init_guess = {
+            "A": 0,
+            "B": 0,
+            "C": 0,
+            "D": 0
+        }
+        init_guess[letter] += 1
+        r.set(roomid, json.dumps(init_guess))
+    else:
+        guesses = json.loads(r.get(roomid))
+        guesses[letter] += 1
+        r.set(roomid, json.dumps(guesses))
+    
+    # update the teacher with the latest student guesses by sending her the latest dict via her socket
+
+    emit("updateGuess", json.loads(r.get(roomid)), room=r.get(f"{roomid}:teacher").decode("utf-8"))
+
     print("request object is", request)
     print(f"client {request.sid} guessed {guess}")
-    
 
 
 
 
 @socketio.on("connect")
 def handle_new_connection():
-    print("a user has connected to the socket")
+    print(f"a user has connected to the socket with sid {request.sid}")
+
+
+@app.route("/startLecture", methods=['POST'])
+def start_lecture():
+    roomid = request.json["roomid"]
+    teacherSocketId = request.json["teacherSocketId"]
+    r.set(f"{roomid}:teacher", str(teacherSocketId))
+    return jsonify({"status": "success"})
 
 @app.route('/time')
 def get_current_time():

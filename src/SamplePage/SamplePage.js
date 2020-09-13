@@ -7,6 +7,7 @@ import Navbar from "../CustomNavbar/CustomNavbar"
 import styles from "./SamplePage.module.css"
 
 import io from 'socket.io-client'
+
 const socket = io('ws://localhost:5000');
 
 function mapStateToProps(state) {
@@ -27,6 +28,7 @@ function SamplePage() {
             socket.emit("join", id)
             console.log("Client joining the room", id)
         })
+       
     }, [])
 
     function handleMC(letter) {
@@ -35,7 +37,7 @@ function SamplePage() {
             "letter": letter
         }
         socket.emit("guess", guessObject)
-        setDisabled(true)
+        //setDisabled(true)
     }
 
     return (
