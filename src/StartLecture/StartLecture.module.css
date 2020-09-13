@@ -1,0 +1,22 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: calc(10px + 2vmin);
+}
+
+.button {
+    height: 5rem;
+}
+
+.letter {
+    padding: 1rem
+}
+
+.stats {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}

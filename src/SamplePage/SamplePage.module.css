@@ -1,0 +1,19 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: calc(10px + 2vmin);
+}
+
+.mContainer {
+    width: 50%;
+    display: flex;
+    justify-content: space-around;
+    padding-bottom: 2rem;
+}
+
+.button {
+    width: 5rem;
+    height: 5rem;
+}
