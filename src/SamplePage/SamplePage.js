@@ -8,8 +8,6 @@ import styles from "./SamplePage.module.css"
 
 import io from 'socket.io-client'
 
-const socket = io('ws://localhost:5000');
-
 function mapStateToProps(state) {
     return {
         sampleData: state.sampleData,
@@ -22,8 +20,11 @@ function SamplePage() {
 
     const [disabled, setDisabled] = useState(false)
 
+    const socket = io('ws://localhost:5000');
+
     //use Effect will only run once, because there is nothing in the array that will change.
     useEffect(() => {
+        
         socket.on("connect", function () {
             socket.emit("join", id)
             console.log("Client joining the room", id)
@@ -44,7 +45,7 @@ function SamplePage() {
         <React.Fragment>
             <Navbar />
             <div className={styles.container}>
-                <p>Peargauge MVP</p>
+                {/* <p> MVP</p> */}
                 {id != null &&
                     <p>Trying to join the room with id {id}</p>}
                 

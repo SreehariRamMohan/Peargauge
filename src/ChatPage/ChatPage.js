@@ -6,11 +6,11 @@ import styles from "./ChatPage.module.css"
 
 // socket io imports
 import io from 'socket.io-client'
-const socket = io('ws://localhost:5000');
 
 function ChatPage() {
     const [messages, setMessages] = useState(["Initial Message"]);
     const [currentMessage, setCurrentMessage] = useState("");
+    const socket = io('ws://localhost:5000');
 
     useEffect(() => {
         getMessages()

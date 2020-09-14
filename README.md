@@ -13,3 +13,5 @@ Libraries:
 - React/Redux/Immer : front end + state management
 - Mongo DB  : database
 - QR Code API : http://goqr.me/api/
+
+Run backend with python server.py

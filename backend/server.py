@@ -11,6 +11,7 @@ app = Flask(__name__)
 
 # connect to redis cache
 r = redis.Redis(host='localhost', port=6379, db=0)
+r.flushdb()
 
 # connect to the MongoDB server running on port 27017 (localhost)
 # the database we're connecting to is called myDatabase (exposed as db)
@@ -62,10 +63,11 @@ def on_guess(guess):
     
     # update the teacher with the latest student guesses by sending her the latest dict via her socket
 
+
     emit("updateGuess", json.loads(r.get(roomid)), room=r.get(f"{roomid}:teacher").decode("utf-8"))
 
-    print("request object is", request)
-    print(f"client {request.sid} guessed {guess}")
+    # print("request object is", request)
+    print(f"** client {request.sid} guessed {guess}")
 
 
 
