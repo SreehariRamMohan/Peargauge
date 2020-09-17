@@ -22,6 +22,8 @@ function StartLecture() {
     const socket = io('ws://localhost:5000');
     
     const [answerData, setAnswerData] = useState({ "A": 0, "B": 0, "C": 0, "D": 0 })
+
+    const [deckTitles, setDeckTitles] = useState([])
     
 
     //chart data. A-D is mapped to index 0-3
@@ -63,6 +65,8 @@ function StartLecture() {
             setChartData(chartDataNew)
             console.log(chartDataNew)
         })
+
+        getDeckTitles()
     }, [])
 
 
@@ -86,12 +90,36 @@ function StartLecture() {
         console.log("started lecture")
     }
 
+    function getDeckTitles() {
+        axios.get("/getDeckNames")
+        .then(res => {
+            return res.data
+        })
+        .then(data => {
+            setDeckTitles(data.titles)
+        })
+    }
+
 
     return (
         <React.Fragment>
             <CustomNavbar />
             <div className={styles.container}>
                 <p>Start Lecture</p>
+
+                <h5>Choose deck</h5>
+
+                <label for="deck">Current Decks</label>
+                <select name="deck">
+                    <option value="" disabled selected>Select one</option>
+                    {
+                        deckTitles.map((value, index, arr) => {
+                            return <option key={index}>{value}</option>
+                            
+                        })
+                    }
+                </select>
+
 
                 {/* while the socket connection is being established prevent the user from submitting */}
                 <button disabled={teacherSocketId == ""} className={styles.button} onClick={startLecture}>Start lecture button</button>

@@ -6,7 +6,10 @@ import Question from "./Question/Question"
 
 import styles from "./CreateLectureDeck.module.css"
 
+const axios = require("axios")
+
 function CreateLectureDeck() {
+    const[title, setTitle] = useState("")
     const [numQuestions, setNumQuestions] = useState(0)
     const [questionContent, setQuestionContent] = useState({})
 
@@ -38,11 +41,33 @@ function CreateLectureDeck() {
         let newState = { ...questionContent }
         newState["" + questionNumber] = { ...newState["" + questionNumber], ...update }
         setQuestionContent(newState)
-        console.log("New question content", newState)
     }
     
     function saveQuestions() {
-        console.log("Question content", questionContent)
+        //convert the dictionary like structure in questionContent to a list
+        let questions = []
+        for (var i = 0; i < numQuestions; i++) {
+            questions.push(questionContent[i+1+""])
+        }
+
+        let payload = {
+            "title": title,
+            "questions": questions
+        }
+
+        axios.post("/createDeck", payload)
+            .then(res => {return res.data})
+            .then(data => {
+                // console.log(data)
+            })
+        
+
+
+
+    }
+
+    function titleChange(e) {
+        setTitle(e.target.value)
     }
 
     return (
@@ -53,7 +78,7 @@ function CreateLectureDeck() {
 
                 <div className={styles.lectureTitleBox}>
                     <p>Lecture Title</p>
-                    <input placeholder="title"></input>
+                    <input placeholder="title" onChange={titleChange}></input>
                 </div>
 
                 {

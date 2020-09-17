@@ -77,12 +77,34 @@ def handle_new_connection():
     print(f"a user has connected to the socket with sid {request.sid}")
 
 
+@app.route("/createDeck", methods=["POST"])
+def create_deck():
+    title = request.json["title"]
+    deck = {
+        "title": title,
+        "questions": request.json["questions"]
+    }
+    mongo.db.sets.insert_one(deck)
+    return jsonify({"status": "success"})
+
 @app.route("/startLecture", methods=['POST'])
 def start_lecture():
     roomid = request.json["roomid"]
     teacherSocketId = request.json["teacherSocketId"]
     r.set(f"{roomid}:teacher", str(teacherSocketId))
     return jsonify({"status": "success"})
+
+
+@app.route("/getDeckNames", methods=['GET'])
+def get_deck_name():
+    decks = mongo.db.sets.find({})
+    print(decks)
+    titles = []
+    for deck in decks:
+        print(deck)
+        titles.append(deck["title"])
+
+    return jsonify({"titles": titles})
 
 @app.route('/time')
 def get_current_time():

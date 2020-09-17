@@ -20,13 +20,10 @@ function Question(props) {
 
     function onChange(event, type) {
         // console.log(props.questionNumber,":",type, ":", event.target.value)
-        // console.log("type is", type)
 
         let update = {...questionData}
         update[type+""] = event.target.value
-        // console.log("Update is", update)
         setQuestionData(update)
-
         props.updateFunction(props.questionNumber, update)
     }
     return (
