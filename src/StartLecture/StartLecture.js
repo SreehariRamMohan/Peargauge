@@ -8,6 +8,8 @@ import io from 'socket.io-client'
 //charting library
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
+//question visualization
+import QuestionViz from "./QuestionViz/QuestionViz"
 
 const axios = require("axios")
 
@@ -24,6 +26,13 @@ function StartLecture() {
     const [answerData, setAnswerData] = useState({ "A": 0, "B": 0, "C": 0, "D": 0 })
 
     const [deckTitles, setDeckTitles] = useState([])
+
+    
+    const [deckTitleSelected, setDeckTitleSelected] = useState("")
+
+    //deck specific fields
+    const [deckSelected, setDeckSelected] = useState({})
+    const [currentQuestion, setCurrentQuestion] = useState(0)
     
 
     //chart data. A-D is mapped to index 0-3
@@ -69,10 +78,12 @@ function StartLecture() {
         getDeckTitles()
     }, [])
 
-
-    function onInputChange(event) {
-        setInputRoomId(event.target.value)
-    }
+    // use a react hook to load in the deck when a user selects one
+    useEffect(() => {
+        if (deckTitleSelected != "") {
+            loadDeck()
+        }
+    }, [deckTitleSelected])
 
     function startLecture(event) {
 
@@ -100,17 +111,35 @@ function StartLecture() {
         })
     }
 
+    function onChange(event, type) {
+        if (type == "room") {
+            setInputRoomId(event.target.value)
+        } else if(type == "deck") {
+            setDeckTitleSelected(event.target.value)
+        }
+    }
+
+    function loadDeck() {
+        // fetch the deckSelected from MongoDB
+        let payload = {
+            "title": deckTitleSelected
+        }
+        axios.post("getDeck", payload)
+            .then(res => {
+                return res.data
+            })
+            .then(data => {
+                setDeckSelected(JSON.parse(data["deck"]))
+            })
+    }
 
     return (
         <React.Fragment>
             <CustomNavbar />
             <div className={styles.container}>
-                <p>Start Lecture</p>
-
-                <h5>Choose deck</h5>
 
                 <label for="deck">Current Decks</label>
-                <select name="deck">
+                <select name="deck" onChange={(e) => onChange(e, "deck")}>
                     <option value="" disabled selected>Select one</option>
                     {
                         deckTitles.map((value, index, arr) => {
@@ -120,11 +149,13 @@ function StartLecture() {
                     }
                 </select>
 
+                {Object.keys(deckSelected).length > 0 ? <QuestionViz title="" question=""/> : <p>Select a deck to get started</p>}
+
 
                 {/* while the socket connection is being established prevent the user from submitting */}
                 <button disabled={teacherSocketId == ""} className={styles.button} onClick={startLecture}>Start lecture button</button>
 
-                <input disabled={lecturePending} placeholder="room id" value={inputRoomId} onChange={onInputChange}></input>
+                <input disabled={lecturePending} placeholder="room id" value={inputRoomId} onChange={(e) => onChange(e, "room")}></input>
                 <p>Question Statistics</p>
 
                 <div className={styles.stats}>

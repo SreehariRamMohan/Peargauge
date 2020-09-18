@@ -106,6 +106,13 @@ def get_deck_name():
 
     return jsonify({"titles": titles})
 
+@app.route("/getDeck", methods=['POST'])
+def get_deck():
+    deck = mongo.db.sets.find_one({"title": request.json["title"]})
+    print("deck found on the backend is", deck)
+    # ObjectId is not by default serializable to json
+    return jsonify({"deck": json.dumps(deck, default=str)})
+
 @app.route('/time')
 def get_current_time():
     return {'time': time.time()}
