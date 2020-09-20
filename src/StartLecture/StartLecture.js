@@ -31,9 +31,7 @@ function StartLecture() {
     const [deckTitleSelected, setDeckTitleSelected] = useState("")
 
     //deck specific fields
-    const [deckSelected, setDeckSelected] = useState({})
-    const [currentQuestion, setCurrentQuestion] = useState(0)
-    
+    const [deckSelected, setDeckSelected] = useState({})    
 
     //chart data. A-D is mapped to index 0-3
     const data = [
@@ -82,7 +80,7 @@ function StartLecture() {
     useEffect(() => {
         if (deckTitleSelected != "") {
             loadDeck()
-        }
+        } 
     }, [deckTitleSelected])
 
     function startLecture(event) {
@@ -149,7 +147,7 @@ function StartLecture() {
                     }
                 </select>
 
-                {Object.keys(deckSelected).length > 0 ? <QuestionViz title="" question=""/> : <p>Select a deck to get started</p>}
+                {Object.keys(deckSelected).length > 0 ? <QuestionViz title={deckSelected["title"]} questions={deckSelected["questions"]}/> : <p>Select a deck to get started</p>}
 
 
                 {/* while the socket connection is being established prevent the user from submitting */}

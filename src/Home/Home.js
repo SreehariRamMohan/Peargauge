@@ -49,7 +49,7 @@ function Home() {
 
               <div>
                 <div className={styles.logoWrapper}>
-                  <img src={require("../res/quiz-white-small.png")}></img>
+                  <img src={require("../res/create-small-white.png")}></img>
                 </div>
                 <p>Create Deck</p>
               </div>
@@ -59,13 +59,13 @@ function Home() {
 
               <div>
                 <div className={styles.logoWrapper}>
-                  <img src={require("../res/quiz-white-small.png")}></img>
+                  <img src={require("../res/join-small-white.png")}></img>
                 </div>
                 <p>Join Session</p>
               </div>
               <div>
                 <div className={styles.logoWrapper}>
-                  <img src={require("../res/quiz-white-small.png")}></img>
+                  <img src={require("../res/settings-white-small.png")}></img>
                 </div>
                 <p>User Settings</p>
               </div>
@@ -76,13 +76,14 @@ function Home() {
 
           <div className={styles.right}>
             <div className={styles.card}>
-
               <div className={styles.imageContainer}>
                 <img className={styles.backgroundImage} src={require("../res/home-background.png")}></img>
                 <p className={styles.centeredText}>{format(new Date(), 'h:mm a')}</p>
                 <p className={styles.dateText}>{format(new Date(), 'PPPP')}</p>
               </div>
-
+              <div className={styles.meetingInformation}>
+                <p>No upcoming meetings today.</p>
+              </div>
             </div>
           </div>
 
