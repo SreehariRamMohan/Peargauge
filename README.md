@@ -14,5 +14,10 @@ Libraries:
 - Mongo DB  : database
 - Recharts : React driven charting library
 - QR Code API : http://goqr.me/api/
+- date-fns : lightweight date formatting library
+
+Photo/Media Credits
+- Credits to Icons8 for a few of the icons on the home page
+- Flower photo on homepage by Katie Drazdauskaite from Unsplash
 
 Run backend with python server.py
