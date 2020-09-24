@@ -92,8 +92,16 @@ def start_lecture():
     roomid = request.json["roomid"]
     teacherSocketId = request.json["teacherSocketId"]
     r.set(f"{roomid}:teacher", str(teacherSocketId))
+
+    r.set(f"{roomid}:question", json.dumps(request.json["question"]))
+
     return jsonify({"status": "success"})
 
+@app.route("/updateQuestion", methods=["POST"])
+def update_question():
+    roomid = request.json["roomid"]
+    question = request.json["question"]
+    socketio.emit("updateQuestion", question, room=roomid)
 
 @app.route("/getDeckNames", methods=['GET'])
 def get_deck_name():

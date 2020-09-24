@@ -22,16 +22,19 @@ function StartLecture() {
 
     const [lecturePending, setLecturePending] = useState(false)
     const socket = io('ws://localhost:5000');
-    
+
     const [answerData, setAnswerData] = useState({ "A": 0, "B": 0, "C": 0, "D": 0 })
 
     const [deckTitles, setDeckTitles] = useState([])
 
-    
+
     const [deckTitleSelected, setDeckTitleSelected] = useState("")
 
     //deck specific fields
-    const [deckSelected, setDeckSelected] = useState({})    
+    const [deckSelected, setDeckSelected] = useState({})
+
+    //index of the question we're on
+    const [qi, setQi] = useState(0)
 
     //chart data. A-D is mapped to index 0-3
     const data = [
@@ -49,7 +52,7 @@ function StartLecture() {
         },
     ];
     const [chartData, setChartData] = useState(data)
-    
+
 
     useEffect(() => {
         console.log("the socket is", socket)
@@ -63,7 +66,7 @@ function StartLecture() {
         socket.on("updateGuess", function (stats) {
             console.log("receiving updated student stats:", stats)
             setAnswerData(stats)
-            
+
             let order = ["A", "B", "C", "D"]
             let chartDataNew = [...chartData]
             for (var i = 0; i < order.length; i++) {
@@ -80,8 +83,35 @@ function StartLecture() {
     useEffect(() => {
         if (deckTitleSelected != "") {
             loadDeck()
-        } 
+        }
     }, [deckTitleSelected])
+
+    //on changes to the question index, we need to emit a message to all clients to update their question. 
+    useEffect(() => {
+        if (deckTitleSelected != "") {
+            let payload = {
+                "question": {
+                    ...deckSelected.questions[qi]
+                },
+                "roomid":inputRoomId
+            }
+
+            /*
+            "question"
+                A: "9"
+                B: "4"
+                C: "1"
+                D: "1"
+                correct: "B"
+                question: "6-2"
+            */
+            
+            axios.post("/updateQuestion", payload) 
+                .then(function (response) {
+                        console.log(response)
+                })
+        }
+    }, [qi])
 
     function startLecture(event) {
 
@@ -99,20 +129,30 @@ function StartLecture() {
         console.log("started lecture")
     }
 
+    function onClick(e, type){
+        if (type == "forward") {
+            setQi(Math.min(qi + 1, deckSelected.questions.length-1))
+        }
+        else if (type == "backward") {
+            setQi(Math.max(qi - 1, 0))
+        }
+
+    }
+
     function getDeckTitles() {
         axios.get("/getDeckNames")
-        .then(res => {
-            return res.data
-        })
-        .then(data => {
-            setDeckTitles(data.titles)
-        })
+            .then(res => {
+                return res.data
+            })
+            .then(data => {
+                setDeckTitles(data.titles)
+            })
     }
 
     function onChange(event, type) {
         if (type == "room") {
             setInputRoomId(event.target.value)
-        } else if(type == "deck") {
+        } else if (type == "deck") {
             setDeckTitleSelected(event.target.value)
         }
     }
@@ -131,6 +171,16 @@ function StartLecture() {
             })
     }
 
+    const questionVizView = (
+        <React.Fragment>
+            <QuestionViz qi={qi} title={deckSelected["title"]} questions={deckSelected["questions"]} />
+            <div>
+                <button onClick={(e) => onClick(e, "forward")}>forward</button>
+                <button onClick={(e) => onClick(e, "backward")}>backward</button>
+            </div>
+        </React.Fragment>
+    )
+
     return (
         <React.Fragment>
             <CustomNavbar />
@@ -142,12 +192,14 @@ function StartLecture() {
                     {
                         deckTitles.map((value, index, arr) => {
                             return <option key={index}>{value}</option>
-                            
+
                         })
                     }
                 </select>
 
-                {Object.keys(deckSelected).length > 0 ? <QuestionViz title={deckSelected["title"]} questions={deckSelected["questions"]}/> : <p>Select a deck to get started</p>}
+
+
+                {Object.keys(deckSelected).length > 0 ? questionVizView : <p>Select a deck to get started</p>}
 
 
                 {/* while the socket connection is being established prevent the user from submitting */}

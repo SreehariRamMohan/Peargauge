@@ -8,6 +8,9 @@ import styles from "./SamplePage.module.css"
 
 import io from 'socket.io-client'
 
+//question visualization
+import QuestionViz from "../StartLecture/QuestionViz/QuestionViz"
+
 function mapStateToProps(state) {
     return {
         sampleData: state.sampleData,
@@ -20,6 +23,8 @@ function SamplePage() {
 
     const [disabled, setDisabled] = useState(false)
 
+    const [currentQuestion, setCurrentQuestion] = useState({})
+
     const socket = io('ws://localhost:5000');
 
     //use Effect will only run once, because there is nothing in the array that will change.
@@ -28,6 +33,12 @@ function SamplePage() {
         socket.on("connect", function () {
             socket.emit("join", id)
             console.log("Client joining the room", id)
+        })
+
+        socket.on("updateQuestion", function(question) {
+            console.log("Question received", question)
+            setCurrentQuestion(question)
+
         })
        
     }, [])
@@ -48,7 +59,9 @@ function SamplePage() {
                 {/* <p> MVP</p> */}
                 {id != null &&
                     <p>Trying to join the room with id {id}</p>}
-                
+
+                    <QuestionViz qi={0} title={"Sample Question"} questions={[currentQuestion]} />
+
                     <div className={styles.mContainer}>
                         <button disabled={disabled} onClick={() => handleMC("A")} className={styles.button}>A</button>
                         <button disabled={disabled} onClick={() => handleMC("B")} className={styles.button}>B</button>
