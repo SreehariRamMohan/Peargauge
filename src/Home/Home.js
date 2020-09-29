@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 
 // react-bootstrap css styling
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+import { OverlayTrigger, Popover } from "react-bootstrap"
+
 import styles from './Home.module.css';
 
 import { compareAsc, format } from 'date-fns'
@@ -16,6 +19,9 @@ import { test_redux } from "../Redux/actions"
 //components
 import Navbar from "../CustomNavbar/CustomNavbar.js"
 
+//allow us to navigate with react-router
+import { useHistory } from "react-router-dom";
+
 //axios
 const axios = require("axios")
 
@@ -25,10 +31,28 @@ function Home() {
 
   const dispatch = useDispatch();
   const [currentTime, setCurrentTime] = useState(0);
+  const [sessionCode, setSessionCode] = useState("")
+  const history = useHistory();
 
   useEffect(() => {
 
   }, []);
+
+  function onClick(type) {
+    if (type == "new_session") {
+      history.push("/start");
+    } else if (type == "create") {
+      history.push("/create");
+    } else if (type == "join") {
+      history.push("/sample");
+    } else if (type == "settings") {
+      history.push("/home");
+    }
+  }
+
+  function onSubmitCode() {
+    history.push("/sample/" + sessionCode);
+  }
 
   return (
     <div>
@@ -40,14 +64,14 @@ function Home() {
           <div className={styles.left}>
 
             <div className={styles.row}>
-              <div>
+              <div onClick={() => onClick("new_session")}>
                 <div className={styles.logoWrapper}>
                   <img src={require("../res/quiz-white-small.png")}></img>
                 </div>
                 <p>New Session</p>
               </div>
 
-              <div>
+              <div onClick={() => onClick("create")}>
                 <div className={styles.logoWrapper}>
                   <img src={require("../res/create-small-white.png")}></img>
                 </div>
@@ -56,14 +80,30 @@ function Home() {
             </div>
 
             <div className={styles.row}>
-
-              <div>
-                <div className={styles.logoWrapper}>
-                  <img src={require("../res/join-small-white.png")}></img>
+              <OverlayTrigger
+                trigger="click"
+                placement="bottom"
+                overlay={
+                  <Popover >
+                    <Popover.Title as="h3">Session Code</Popover.Title>
+                    <Popover.Content>
+                      <div className={styles.session_popup}>
+                        <input placeholder={"27"} value={sessionCode} onInput={(e) => {setSessionCode(e.target.value)}}></input>
+                        <button onClick={onSubmitCode}>submit</button>
+                      </div>
+                    </Popover.Content>
+                  </Popover>
+                }
+              >
+                <div onClick={() => onClick("jocin")}>
+                  <div className={styles.logoWrapper}>
+                    <img src={require("../res/join-small-white.png")}></img>
+                  </div>
+                  <p>Join Session</p>
                 </div>
-                <p>Join Session</p>
-              </div>
-              <div>
+              </OverlayTrigger>
+
+              <div onClick={() => onClick("new_session")}>
                 <div className={styles.logoWrapper}>
                   <img src={require("../res/settings-white-small.png")}></img>
                 </div>
