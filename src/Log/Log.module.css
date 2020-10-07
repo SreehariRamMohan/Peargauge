@@ -1,0 +1,43 @@
+.hero {
+    min-height: 100vh;
+    min-width: 100vw;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background-repeat: no-repeat;
+    background-size: cover;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 15rem;
+    align-items: center;
+    
+}
+
+.card {
+    background-color: whitesmoke;
+    opacity: 0.9;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 1em;
+    margin-bottom: 1em;
+    
+    width: 50%;
+    text-align: left;
+
+    border-top-right-radius: 5rem;
+    border-bottom-left-radius: 5rem;
+    border-top-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+}
+
+.cardHeader {
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
