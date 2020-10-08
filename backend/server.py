@@ -1,13 +1,15 @@
 import time
 import json
 from flask import Flask, jsonify
-from flask_pymongo import PyMongo
+from flask_pymongo import PyMongo, pymongo
 from flask import request
 from bson.objectid import ObjectId
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 import redis
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 
 # connect to redis cache
 r = redis.Redis(host='localhost', port=6379, db=0)
@@ -19,6 +21,7 @@ r.flushdb()
 # example: mongo.db.users.find()
 app.config["MONGO_URI"] = "mongodb://localhost:27017/test"
 mongo = PyMongo(app)
+mongo.db.users.create_index([('username', pymongo.DESCENDING)], unique=True)
 
 # to verify mongodb is working locally, try querying documents from a sample collection within a database
 print("return all documents in the sample collection",mongo.db.sample.find_one())
@@ -120,6 +123,37 @@ def get_deck():
     print("deck found on the backend is", deck)
     # ObjectId is not by default serializable to json
     return jsonify({"deck": json.dumps(deck, default=str)})
+
+@app.route("/createUser", methods=["POST"])
+def create_user():
+    username = request.json["username"]
+    password = request.json["password"]
+    pw_hash = bcrypt.generate_password_hash(password)
+
+    user = {
+        "username": username,
+        "password": pw_hash
+    }
+    try:
+        mongo.db.users.insert_one(user)
+    except pymongo.errors.DuplicateKeyError: 
+        return {'status': "failure, duplicate username exists"}
+    return {'status': "success"}
+
+@app.route("/loginUser", methods=["POST"])
+def login_user():
+    username = request.json["username"]
+    password = request.json["password"]
+
+    password_hash = mongo.db.users.find_one({"username": username})["password"]
+
+    if bcrypt.check_password_hash(password_hash, password):
+        return {'status': "success"}
+    else:
+        return {'status': "incorrect username or password"}
+
+    
+
 
 @app.route('/time')
 def get_current_time():

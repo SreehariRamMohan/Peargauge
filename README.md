@@ -9,12 +9,13 @@ Teachers create a "deck" of questions they want to use to track student understa
 Libraries:
 - Socket.io : realtime student choice recording
 - Flask : backend
-- Redis : to manage ephemeral server state & caching
+- Redis : to manage ephemeral server state & caching (socket rooms, session ids, quiz answers, etc)
 - React/Redux/Immer : front end + state management
 - Mongo DB  : database
 - Recharts : React driven charting library
 - QR Code API : http://goqr.me/api/
 - date-fns : lightweight date formatting library
+- bcrypt : hash passwords
 
 Photo/Media Credits
 - Credits to Icons8 for a few of the icons on the home page
