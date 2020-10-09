@@ -7,8 +7,15 @@ from bson.objectid import ObjectId
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 import redis
 from flask_bcrypt import Bcrypt
+from jwt_auth.User import authenticate, identity
+from flask_jwt import JWT, jwt_required, current_identity
 
 app = Flask(__name__)
+
+# jwt 
+app.config['SECRET_KEY'] = 'super-secret'
+jwt = JWT(app, authenticate, identity)
+
 bcrypt = Bcrypt(app)
 
 # connect to redis cache
@@ -153,8 +160,6 @@ def login_user():
         return {'status': "incorrect username or password"}
 
     
-
-
 @app.route('/time')
 def get_current_time():
     return {'time': time.time()}
@@ -166,6 +171,12 @@ def get_user(id):
     user = mongo.db.sample.find_one({"_id": ObjectId(id)})
     print(user)
     return json.dumps(user, default=str)
+
+@app.route('/protected')
+@jwt_required()
+def protected():
+    return '%s' % current_identity
+
 
 if __name__ == '__main__':
     socketio.run(app)
