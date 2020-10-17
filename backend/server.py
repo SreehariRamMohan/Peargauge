@@ -10,7 +10,7 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, create_refresh_token, get_jwt_identity, jwt_refresh_token_required
 import os
 
-app = Flask(__name__, static_folder='../build')
+app = Flask(__name__, static_folder='build')
 # jwt 
 app.config['SECRET_KEY'] = 'super-secret'
 jwt = JWTManager(app)
