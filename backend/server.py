@@ -28,7 +28,6 @@ else:
     # local development
     r = redis.Redis(host='localhost', port=6379, db=0)
     r.flushdb()
-    
     # connect to the MongoDB server running on port 27017 (localhost)
     # the database we're connecting to is called myDatabase (exposed as db)
     # "db" is a reference to the database which can be referenced in routes/views
@@ -39,7 +38,7 @@ else:
 mongo.db.users.create_index([('username', pymongo.DESCENDING)], unique=True)
 
 # to verify mongodb is working locally, try querying documents from a sample collection within a database
-print("return all documents in the sample collection",mongo.db.sample.find_one())
+# print("return all documents in the sample collection",mongo.db.sample.find_one())
 
 #Optional Socket.IO compatibility added as a template
 app.config['SECRET_KEY'] = 'secret!'
