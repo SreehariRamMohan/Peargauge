@@ -3,18 +3,60 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router"
 import CustomNavbar from "../CustomNavbar/CustomNavbar"
 import { Card, Nav, Button, Form, Row, Col } from "react-bootstrap"
+import { useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
+import { set_jwt_token } from "../Redux/actions"
 
 import styles from './Log.module.css';
 import svg from "../res/peargauge-background_03.svg"
 
 const axios = require("axios")
 
+
 function Log() {
 
     const [loginState, toggleLoginState] = useState(true)
-    
+
     const usernameRef = React.createRef();
     const passwordRef = React.createRef();
+    const history = useHistory();
+    const dispatch = useDispatch();
+
+    const jwt_token = useSelector((state) => state.jwt_token);
+
+    // define an axios interceptor to automatically request a refresh token from flask-jwt if the access_token is expired
+    axios.interceptors.response.use(
+        (response) => {
+            return response
+        },
+        (error) => {
+            return new Promise((resolve, reject) => {
+                const originalRequest = error.config
+                const refreshToken = localStorage.getItem('refresh_token')
+                if (refreshToken) {
+                    axios({
+                        method: "post",
+                        url: `/refresh`,
+                        withCredentials: true,
+                        headers: {
+                            Authorization: `Bearer ${jwt_token}`,
+                        },
+                    })
+                        .then((res) => res.json())
+                        .then((res) => {
+
+                            let non_fresh_access_token = res.data["access_token"]
+                            dispatch(set_jwt_token(non_fresh_access_token))
+                            resolve(axios(originalRequest)) 
+                        })
+                } else {
+                    // redirect to login page since we don't have a refresh token. 
+                    return reject("no refresh token availible")
+                }
+            })
+        },
+    )
 
     function toggle(bool) {
         toggleLoginState(bool)
@@ -33,10 +75,19 @@ function Log() {
         }
 
         axios.post(route, payload)
-        .then(res => {return res.data})
-        .then(data => {
-            console.log(data)
-        })
+            .then(res => {
+                if (res.status == 200) {
+                    let access_token = res.data["access_token"]
+                    let refresh_token = res.data["refresh_token"]
+
+                    // store the access token in redux and the refresh token in local storage
+                    dispatch(set_jwt_token(access_token))
+                    localStorage.setItem("refresh_token", refresh_token);
+
+                    refresh_token =
+                        history.push("/home");
+                }
+            })
 
     }
 

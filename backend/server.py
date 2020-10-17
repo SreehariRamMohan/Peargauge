@@ -2,19 +2,18 @@ import time
 import json
 from flask import Flask, jsonify
 from flask_pymongo import PyMongo, pymongo
-from flask import request
+from flask import request, Flask, send_from_directory
 from bson.objectid import ObjectId
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 import redis
 from flask_bcrypt import Bcrypt
-from jwt_auth.User import authenticate, identity
-from flask_jwt import JWT, jwt_required, current_identity
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, create_refresh_token, get_jwt_identity, jwt_refresh_token_required
+import os
 
-app = Flask(__name__)
-
+app = Flask(__name__, static_folder='../build')
 # jwt 
 app.config['SECRET_KEY'] = 'super-secret'
-jwt = JWT(app, authenticate, identity)
+jwt = JWTManager(app)
 
 bcrypt = Bcrypt(app)
 
@@ -28,6 +27,7 @@ r.flushdb()
 # example: mongo.db.users.find()
 app.config["MONGO_URI"] = "mongodb://localhost:27017/test"
 mongo = PyMongo(app)
+
 mongo.db.users.create_index([('username', pymongo.DESCENDING)], unique=True)
 
 # to verify mongodb is working locally, try querying documents from a sample collection within a database
@@ -87,6 +87,16 @@ def handle_new_connection():
     print(f"a user has connected to the socket with sid {request.sid}")
 
 
+# serve the static react build files from flask. 
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path != "" and os.path.exists(app.static_folder + '/' + path):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
+
+
 @app.route("/createDeck", methods=["POST"])
 def create_deck():
     title = request.json["title"]
@@ -143,9 +153,10 @@ def create_user():
     }
     try:
         mongo.db.users.insert_one(user)
+        access_token = create_access_token(identity=username)
+        return jsonify(access_token=access_token), 201
     except pymongo.errors.DuplicateKeyError: 
         return {'status': "failure, duplicate username exists"}
-    return {'status': "success"}
 
 @app.route("/loginUser", methods=["POST"])
 def login_user():
@@ -155,9 +166,24 @@ def login_user():
     password_hash = mongo.db.users.find_one({"username": username})["password"]
 
     if bcrypt.check_password_hash(password_hash, password):
-        return {'status': "success"}
+        ret = {
+            'access_token': create_access_token(identity=username),
+            'refresh_token': create_refresh_token(identity=username)
+        }
+        return jsonify(ret), 200
     else:
-        return {'status': "incorrect username or password"}
+        return {'status': "incorrect username or password"}, 404
+
+# Route to create a new access token (not fresh) given a refresh token. 
+@app.route('/refresh', methods=['POST'])
+@jwt_refresh_token_required
+def refresh():
+    current_user = get_jwt_identity()
+    # mark the refresh token as not fresh since we don't verify the password authenticity in this step
+    ret = {
+        'access_token': create_access_token(identity=current_user, fresh=False)
+    }
+    return jsonify(ret), 200
 
     
 @app.route('/time')
@@ -172,11 +198,15 @@ def get_user(id):
     print(user)
     return json.dumps(user, default=str)
 
-@app.route('/protected')
-@jwt_required()
-def protected():
-    return '%s' % current_identity
 
+# Protect a view with jwt_required, which requires a valid access token
+# in the request to access.
+@app.route('/protected', methods=['GET'])
+@jwt_required
+def protected():
+    # Access the identity of the current user with get_jwt_identity
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
 
 if __name__ == '__main__':
     socketio.run(app)
