@@ -9,6 +9,7 @@ import redis
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, create_refresh_token, get_jwt_identity, jwt_refresh_token_required
 import os
+from os import environ
 
 app = Flask(__name__, static_folder='build')
 # jwt 
@@ -18,15 +19,22 @@ jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
 
 # connect to redis cache
-r = redis.Redis(host='localhost', port=6379, db=0)
-r.flushdb()
-
-# connect to the MongoDB server running on port 27017 (localhost)
-# the database we're connecting to is called myDatabase (exposed as db)
-# "db" is a reference to the database which can be referenced in routes/views
-# example: mongo.db.users.find()
-app.config["MONGO_URI"] = "mongodb://localhost:27017/test"
-mongo = PyMongo(app)
+if "PROD" in os.environ:
+    # connect to redis store on heroku
+    r = redis.from_url(os.environ['REDIS_URL'])
+    app.config["MONGO_URI"] = os.environ['MONGO_URI']
+    mongo = PyMongo(app)
+else:
+    # local development
+    r = redis.Redis(host='localhost', port=6379, db=0)
+    r.flushdb()
+    
+    # connect to the MongoDB server running on port 27017 (localhost)
+    # the database we're connecting to is called myDatabase (exposed as db)
+    # "db" is a reference to the database which can be referenced in routes/views
+    # example: mongo.db.users.find()
+    app.config["MONGO_URI"] = "mongodb://localhost:27017/test"
+    mongo = PyMongo(app)
 
 mongo.db.users.create_index([('username', pymongo.DESCENDING)], unique=True)
 
