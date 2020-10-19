@@ -10,6 +10,7 @@ import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend } fro
 
 //question visualization
 import QuestionViz from "./QuestionViz/QuestionViz"
+import {URL} from "../Redux/constants"
 
 const axios = require("axios")
 
@@ -62,6 +63,7 @@ function StartLecture() {
 
             // each teacher will join their own "unique" room so we can send back updates about student MC choices
             socket.emit("join", socket.id)
+            console.log("Teacher joining unique room " + socket.id)
         })
         socket.on("updateGuess", function (stats) {
             console.log("receiving updated student stats:", stats)
@@ -106,7 +108,7 @@ function StartLecture() {
                 question: "6-2"
             */
             
-            axios.post("/updateQuestion", payload) 
+            axios.post(URL + "/updateQuestion", payload) 
                 .then(function (response) {
                         console.log(response)
                 })
@@ -120,10 +122,22 @@ function StartLecture() {
             "teacherSocketId": teacherSocketId
         }
 
-        axios.post('/startLecture', payload)
+        axios.post(URL+'/startLecture', payload)
             .then(function (response) {
                 //reset the room id
                 setLecturePending(true)
+
+                //send the 0th question to the student. 
+                let payload = {
+                    "question": {
+                        ...deckSelected.questions[qi]
+                    },
+                    "roomid":inputRoomId
+                }                
+                axios.post(URL + "/updateQuestion", payload) 
+                    .then(function (response) {
+                            console.log(response)
+                    })
             })
 
         console.log("started lecture")
@@ -140,7 +154,7 @@ function StartLecture() {
     }
 
     function getDeckTitles() {
-        axios.get("/getDeckNames")
+        axios.get(URL+"/getDeckNames")
             .then(res => {
                 return res.data
             })
@@ -162,7 +176,7 @@ function StartLecture() {
         let payload = {
             "title": deckTitleSelected
         }
-        axios.post("getDeck", payload)
+        axios.post(URL+"/getDeck", payload)
             .then(res => {
                 return res.data
             })

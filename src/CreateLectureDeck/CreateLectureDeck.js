@@ -6,6 +6,8 @@ import Question from "./Question/Question"
 
 import styles from "./CreateLectureDeck.module.css"
 
+import {URL} from "../Redux/constants"
+
 const axios = require("axios")
 
 function CreateLectureDeck() {
@@ -55,7 +57,7 @@ function CreateLectureDeck() {
             "questions": questions
         }
 
-        axios.post("/createDeck", payload)
+        axios.post(URL + "/createDeck", payload)
             .then(res => {return res.data})
             .then(data => {
                 // console.log(data)

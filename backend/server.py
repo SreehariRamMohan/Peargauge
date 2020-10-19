@@ -8,10 +8,14 @@ from flask_socketio import SocketIO, send, emit, join_room, leave_room
 import redis
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, create_refresh_token, get_jwt_identity, jwt_refresh_token_required
+from flask_cors import CORS, cross_origin
 import os
 from os import environ
 
 app = Flask(__name__, static_folder='build')
+
+CORS(app, resources={r"*": {"origins": "http://localhost:3000", "supports_credentials": True}})
+
 # jwt 
 app.config['SECRET_KEY'] = 'super-secret'
 jwt = JWTManager(app)
@@ -73,14 +77,15 @@ def on_guess(guess):
         }
         init_guess[letter] += 1
         r.set(roomid, json.dumps(init_guess))
+        print(f"in guess: printing the value of r.get(roomid) {json.loads(r.get(roomid))}")
     else:
         guesses = json.loads(r.get(roomid))
         guesses[letter] += 1
         r.set(roomid, json.dumps(guesses))
     
     # update the teacher with the latest student guesses by sending her the latest dict via her socket
-
-
+    teacher_room_id = r.get(f"{roomid}:teacher").decode("utf-8")
+    print(f"trying to updateGuess to teacher's room {teacher_room_id}")
     emit("updateGuess", json.loads(r.get(roomid)), room=r.get(f"{roomid}:teacher").decode("utf-8"))
 
     # print("request object is", request)
@@ -103,8 +108,7 @@ def serve(path):
     else:
         return send_from_directory(app.static_folder, 'index.html')
 
-
-@app.route("/createDeck", methods=["POST"])
+@app.route("/api/createDeck", methods=["POST"])
 def create_deck():
     title = request.json["title"]
     deck = {
@@ -114,23 +118,24 @@ def create_deck():
     mongo.db.sets.insert_one(deck)
     return jsonify({"status": "success"})
 
-@app.route("/startLecture", methods=['POST'])
+@app.route("/api/startLecture", methods=['POST'])
 def start_lecture():
     roomid = request.json["roomid"]
     teacherSocketId = request.json["teacherSocketId"]
     r.set(f"{roomid}:teacher", str(teacherSocketId))
 
-    r.set(f"{roomid}:question", json.dumps(request.json["question"]))
+    # r.set(f"{roomid}:question", json.dumps(request.json["question"]))
 
     return jsonify({"status": "success"})
 
-@app.route("/updateQuestion", methods=["POST"])
+@app.route("/api/updateQuestion", methods=["POST"])
 def update_question():
     roomid = request.json["roomid"]
     question = request.json["question"]
     socketio.emit("updateQuestion", question, room=roomid)
+    return jsonify({"status": "success"})
 
-@app.route("/getDeckNames", methods=['GET'])
+@app.route("/api/getDeckNames", methods=['GET'])
 def get_deck_name():
     decks = mongo.db.sets.find({})
     print(decks)
@@ -141,14 +146,14 @@ def get_deck_name():
 
     return jsonify({"titles": titles})
 
-@app.route("/getDeck", methods=['POST'])
+@app.route("/api/getDeck", methods=['POST'])
 def get_deck():
     deck = mongo.db.sets.find_one({"title": request.json["title"]})
     print("deck found on the backend is", deck)
     # ObjectId is not by default serializable to json
     return jsonify({"deck": json.dumps(deck, default=str)})
 
-@app.route("/createUser", methods=["POST"])
+@app.route("/api/createUser", methods=["POST"])
 def create_user():
     username = request.json["username"]
     password = request.json["password"]
@@ -165,7 +170,7 @@ def create_user():
     except pymongo.errors.DuplicateKeyError: 
         return {'status': "failure, duplicate username exists"}
 
-@app.route("/loginUser", methods=["POST"])
+@app.route("/api/loginUser", methods=["POST"])
 def login_user():
     username = request.json["username"]
     password = request.json["password"]
@@ -182,7 +187,7 @@ def login_user():
         return {'status': "incorrect username or password"}, 404
 
 # Route to create a new access token (not fresh) given a refresh token. 
-@app.route('/refresh', methods=['POST'])
+@app.route('/api/refresh', methods=['POST'])
 @jwt_refresh_token_required
 def refresh():
     current_user = get_jwt_identity()
@@ -193,13 +198,13 @@ def refresh():
     return jsonify(ret), 200
 
     
-@app.route('/time')
+@app.route('/api/time', methods=['GET'])
 def get_current_time():
     return {'time': time.time()}
 
 # to access data sent in the request body, use the form attribute. 
 # request.form["username"] accesses the "username" key in the request body
-@app.route('/user/<id>', methods=['GET'])
+@app.route('/api/user/<id>', methods=['GET'])
 def get_user(id):
     user = mongo.db.sample.find_one({"_id": ObjectId(id)})
     print(user)
@@ -208,7 +213,7 @@ def get_user(id):
 
 # Protect a view with jwt_required, which requires a valid access token
 # in the request to access.
-@app.route('/protected', methods=['GET'])
+@app.route('/api/protected', methods=['GET'])
 @jwt_required
 def protected():
     # Access the identity of the current user with get_jwt_identity

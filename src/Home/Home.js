@@ -22,6 +22,8 @@ import Navbar from "../CustomNavbar/CustomNavbar.js"
 //allow us to navigate with react-router
 import { useHistory } from "react-router-dom";
 
+import {URL} from "../Redux/constants"
+
 //axios
 const axios = require("axios")
 

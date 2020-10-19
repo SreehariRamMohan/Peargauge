@@ -27,3 +27,4 @@ backend/.flaskenv
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+backend/.flaskenv

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router"
 import CustomNavbar from "../CustomNavbar/CustomNavbar"
@@ -10,6 +10,7 @@ import { set_jwt_token } from "../Redux/actions"
 
 import styles from './Log.module.css';
 import svg from "../res/peargauge-background_03.svg"
+import { URL } from "../Redux/constants"
 
 const axios = require("axios")
 
@@ -26,38 +27,43 @@ function Log() {
     const jwt_token = useSelector((state) => state.jwt_token);
 
     // define an axios interceptor to automatically request a refresh token from flask-jwt if the access_token is expired
-    axios.interceptors.response.use(
-        (response) => {
-            return response
-        },
-        (error) => {
-            return new Promise((resolve, reject) => {
-                const originalRequest = error.config
-                const refreshToken = localStorage.getItem('refresh_token')
-                if (refreshToken) {
-                    axios({
-                        method: "post",
-                        url: `/refresh`,
-                        withCredentials: true,
-                        headers: {
-                            Authorization: `Bearer ${jwt_token}`,
-                        },
-                    })
-                        .then((res) => res.json())
-                        .then((res) => {
+    // axios.interceptors.response.use(
+    //     (response) => {
+    //         return response
+    //     },
+    //     (error) => {
+    //         return new Promise((resolve, reject) => {
+    //             const originalRequest = error.config
+    //             const refreshToken = localStorage.getItem('refresh_token')
+    //             if (refreshToken) {
+    //                 axios({
+    //                     method: "post",
+    //                     url: URL + `/refresh`,
+    //                     withCredentials: true,
+    //                     headers: {
+    //                         Authorization: `Bearer ${jwt_token}`,
+    //                     },
+    //                 })
+    //                     .then((res) => res.json())
+    //                     .then((res) => {
 
-                            let non_fresh_access_token = res.data["access_token"]
-                            dispatch(set_jwt_token(non_fresh_access_token))
-                            resolve(axios(originalRequest)) 
-                        })
-                } else {
-                    // redirect to login page since we don't have a refresh token. 
-                    return reject("no refresh token availible")
-                }
-            })
-        },
-    )
-
+    //                         let non_fresh_access_token = res.data["access_token"]
+    //                         dispatch(set_jwt_token(non_fresh_access_token))
+    //                         resolve(axios(originalRequest))
+    //                     })
+    //             } else {
+    //                 // redirect to login page since we don't have a refresh token. 
+    //                 return reject("no refresh token availible")
+    //             }
+    //         })
+    //     },
+    // )
+    
+    useEffect(() => {
+        console.log(`URL is ${URL}`)
+    }, []);
+    
+    
     function toggle(bool) {
         toggleLoginState(bool)
     }
@@ -69,9 +75,9 @@ function Log() {
             "password": passwordRef.current.value
         }
 
-        let route = "/loginUser"
+        let route = URL + "/loginUser"
         if (!loginState) {
-            route = "/createUser"
+            route = URL + "/createUser"
         }
 
         axios.post(route, payload)
