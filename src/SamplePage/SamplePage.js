@@ -10,6 +10,7 @@ import io from 'socket.io-client'
 
 //question visualization
 import QuestionViz from "../StartLecture/QuestionViz/QuestionViz"
+import { WEBSOCKET_URL } from "../Redux/constants";
 
 function mapStateToProps(state) {
     return {
@@ -25,7 +26,7 @@ function SamplePage() {
 
     const [currentQuestion, setCurrentQuestion] = useState({})
 
-    const socket = io('ws://localhost:5000');
+    const socket = io('ws://' + WEBSOCKET_URL);
 
     //use Effect will only run once, because there is nothing in the array that will change.
     useEffect(() => {
@@ -38,7 +39,14 @@ function SamplePage() {
         socket.on("updateQuestion", function(question) {
             console.log("Question received", question)
             setCurrentQuestion(question)
+        })
 
+        socket.on("initQuestion", function(question) {
+            console.log("here in init question question received is", question, "current question", currentQuestion)
+            if (Object.keys(currentQuestion).length === 0) {
+                setCurrentQuestion(question)
+                console.log("initializing first question with", question)
+            }
         })
        
     }, [])

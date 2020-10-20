@@ -55,6 +55,10 @@ def on_join(roomid):
     print(f"Adding client to room {roomid} on server side")
     #print(request.sid)
     join_room(roomid)
+    print(r.exists(f"{roomid}:current_question"))
+    if (r.exists(f"{roomid}:current_question")):
+        emit("initQuestion", json.loads(r.get(f"{roomid}:current_question")))
+        print("sending initial question to client who just joined")
 
 """
 guess object:
@@ -124,7 +128,8 @@ def start_lecture():
     teacherSocketId = request.json["teacherSocketId"]
     r.set(f"{roomid}:teacher", str(teacherSocketId))
 
-    # r.set(f"{roomid}:question", json.dumps(request.json["question"]))
+    r.set(f"{roomid}:current_question", json.dumps(request.json["question"])) # we need this in our key-store to handle users to get the 
+    # initial (first) question when the session just starts (because they will have missed the updateQuestion being emitted.)
 
     return jsonify({"status": "success"})
 

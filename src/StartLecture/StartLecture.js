@@ -10,7 +10,7 @@ import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend } fro
 
 //question visualization
 import QuestionViz from "./QuestionViz/QuestionViz"
-import {URL} from "../Redux/constants"
+import {URL, WEBSOCKET_URL} from "../Redux/constants"
 
 const axios = require("axios")
 
@@ -22,7 +22,7 @@ function StartLecture() {
     const [teacherSocketId, setTeacherSocketId] = useState("")
 
     const [lecturePending, setLecturePending] = useState(false)
-    const socket = io('ws://localhost:5000');
+    const socket = io('ws://' + WEBSOCKET_URL);
 
     const [answerData, setAnswerData] = useState({ "A": 0, "B": 0, "C": 0, "D": 0 })
 
@@ -56,6 +56,7 @@ function StartLecture() {
 
 
     useEffect(() => {
+        console.log("API URL is", URL, "websocket URL is", WEBSOCKET_URL)
         console.log("the socket is", socket)
         socket.on("connect", function () {
             console.log("Connected: socket id is", socket.id)
@@ -119,25 +120,16 @@ function StartLecture() {
 
         let payload = {
             "roomid": inputRoomId,
-            "teacherSocketId": teacherSocketId
+            "teacherSocketId": teacherSocketId,
+            "question": {
+                ...deckSelected.questions[qi]
+            },
         }
 
         axios.post(URL+'/startLecture', payload)
             .then(function (response) {
                 //reset the room id
                 setLecturePending(true)
-
-                //send the 0th question to the student. 
-                let payload = {
-                    "question": {
-                        ...deckSelected.questions[qi]
-                    },
-                    "roomid":inputRoomId
-                }                
-                axios.post(URL + "/updateQuestion", payload) 
-                    .then(function (response) {
-                            console.log(response)
-                    })
             })
 
         console.log("started lecture")

@@ -8,7 +8,7 @@ Teachers create a "deck" of questions they want to use to track student understa
 
 Libraries:
 - Socket.io : realtime student choice recording
-- Flask : backend
+- Flask (+ Flask-Cors, Flask-JWT): backend
 - Redis : to manage ephemeral server state & caching (socket rooms, session ids, quiz answers, etc)
 - React/Redux/Immer : front end + state management
 - Mongo DB  : database
@@ -20,5 +20,7 @@ Libraries:
 Photo/Media Credits
 - Credits to Icons8 for a few of the icons on the home page
 - Flower photo on homepage by Katie Drazdauskaite from Unsplash
+
+Deployed on Heroku
 
 Run backend with python server.py
