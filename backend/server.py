@@ -14,9 +14,11 @@ from os import environ
 
 app = Flask(__name__, static_folder='build')
 
-origin = "http://localhost:8000"
+origin = "http://localhost:3000"
 if "PROD" in os.environ:
     origin = "https://peargauge-dev.herokuapp.com"
+
+print("Origin is", origin)
 
 CORS(app, resources={r"*": {"origins": origin, "supports_credentials": True}})
 

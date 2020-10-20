@@ -26,7 +26,7 @@ function SamplePage() {
 
     const [currentQuestion, setCurrentQuestion] = useState({})
 
-    const socket = io('ws://' + WEBSOCKET_URL);
+    const socket = io(WEBSOCKET_URL);
 
     //use Effect will only run once, because there is nothing in the array that will change.
     useEffect(() => {

@@ -22,7 +22,7 @@ function StartLecture() {
     const [teacherSocketId, setTeacherSocketId] = useState("")
 
     const [lecturePending, setLecturePending] = useState(false)
-    const socket = io('ws://' + WEBSOCKET_URL);
+    const socket = io(WEBSOCKET_URL);
 
     const [answerData, setAnswerData] = useState({ "A": 0, "B": 0, "C": 0, "D": 0 })
 
