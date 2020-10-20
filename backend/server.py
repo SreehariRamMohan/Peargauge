@@ -14,7 +14,11 @@ from os import environ
 
 app = Flask(__name__, static_folder='build')
 
-CORS(app, resources={r"*": {"origins": "http://localhost:3000", "supports_credentials": True}})
+origin = "http://localhost:8000"
+if "PROD" in os.environ:
+    origin = "https://peargauge-dev.herokuapp.com"
+
+CORS(app, resources={r"*": {"origins": origin, "supports_credentials": True}})
 
 # jwt 
 app.config['SECRET_KEY'] = 'super-secret'
