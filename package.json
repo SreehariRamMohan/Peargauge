@@ -19,13 +19,15 @@
     "react-scripts": "3.4.3",
     "recharts": "^1.8.5",
     "redux": "^4.0.5",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "uuid": "^8.3.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "postbuild": "mv build backend"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -4,13 +4,14 @@ import { withRouter } from "react-router"
 import CustomNavbar from "../CustomNavbar/CustomNavbar"
 import styles from "./StartLecture.module.css"
 import io from 'socket.io-client'
+import { v4 as uuidv4 } from 'uuid';
 
 //charting library
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 //question visualization
 import QuestionViz from "./QuestionViz/QuestionViz"
-import {URL, WEBSOCKET_URL} from "../Redux/constants"
+import {URL, WEBSOCKET_URL, generate_join_url} from "../Redux/constants"
 
 const axios = require("axios")
 
@@ -27,7 +28,6 @@ function StartLecture() {
     const [answerData, setAnswerData] = useState({ "A": 0, "B": 0, "C": 0, "D": 0 })
 
     const [deckTitles, setDeckTitles] = useState([])
-
 
     const [deckTitleSelected, setDeckTitleSelected] = useState("")
 
@@ -80,6 +80,8 @@ function StartLecture() {
         })
 
         getDeckTitles()
+
+        initializeRoomId()
     }, [])
 
     // use a react hook to load in the deck when a user selects one
@@ -111,10 +113,16 @@ function StartLecture() {
             
             axios.post(URL + "/updateQuestion", payload) 
                 .then(function (response) {
-                        console.log(response)
+                        console.log(response.body)
                 })
         }
     }, [qi])
+
+
+    function initializeRoomId() {
+        const uuid = uuidv4()
+        setInputRoomId(uuid)
+    }
 
     function startLecture(event) {
 
@@ -123,8 +131,8 @@ function StartLecture() {
             "teacherSocketId": teacherSocketId,
             "question": {
                 ...deckSelected.questions[qi]
-            },
-        }
+            }
+        }   
 
         axios.post(URL+'/startLecture', payload)
             .then(function (response) {
@@ -211,7 +219,10 @@ function StartLecture() {
                 {/* while the socket connection is being established prevent the user from submitting */}
                 <button disabled={teacherSocketId == ""} className={styles.button} onClick={startLecture}>Start lecture button</button>
 
-                <input disabled={lecturePending} placeholder="room id" value={inputRoomId} onChange={(e) => onChange(e, "room")}></input>
+                <input disabled={true} placeholder="room id" value={inputRoomId} onChange={(e) => onChange(e, "room")}></input>
+                
+                {inputRoomId != "" && <div><p>Have participants scan this QR code with their phone to get started</p><img src={"https://api.qrserver.com/v1/create-qr-code/?data=" + generate_join_url(inputRoomId) +"&amp;size=100x100"} /></div>}
+
                 <p>Question Statistics</p>
 
                 <div className={styles.stats}>
