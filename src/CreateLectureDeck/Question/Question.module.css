@@ -2,14 +2,25 @@
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
+    justify-content: center;
+    align-items: center;
     padding: 1em;
     margin-bottom: 1em;
     
-    width: 100%;
-    text-align: left;
+    width: 90%;
+    border-radius: 2rem;
   }
+
+  .question {
+    width: 90%;
+    border-radius: 1rem;
+  }
+
+  .option {
+    border-radius: 1rem;
+  }
+
+ 
 
   .mContainer {
     width: 50%;

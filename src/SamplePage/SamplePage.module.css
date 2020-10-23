@@ -4,6 +4,7 @@
     justify-content: center;
     align-items: center;
     font-size: calc(10px + 2vmin);
+    padding-top: 2rem;
 }
 
 .mContainer {
@@ -14,6 +15,18 @@
 }
 
 .button {
-    width: 5rem;
-    height: 5rem;
+    width: 7rem;
+    height: 7rem;
+    border-radius: 2rem;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.badgeContainer {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-end;
+    padding-right: 3rem;
+    padding-left: 3rem;
+
 }

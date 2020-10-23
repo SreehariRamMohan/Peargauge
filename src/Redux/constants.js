@@ -9,6 +9,6 @@ export const generate_join_url = (uid) => {
     if (window.location.hostname == "peargauge-dev.herokuapp.com") {
         return "https://peargauge-dev.herokuapp.com/sample/" + uid
     } else {
-        return "http://localhost:5000/sample/" + uid
+        return "http://localhost:3000/sample/" + uid
     } 
 } 

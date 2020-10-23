@@ -211,7 +211,7 @@ function StartLecture() {
     const questionVizView = (demo) => {
         return (
             <React.Fragment>
-                <QuestionViz demo={demo} forward={onClick} backward={onClick} qi={qi} title={deckSelected["title"]} questions={deckSelected["questions"]} />
+                <QuestionViz client={false} demo={demo} forward={onClick} backward={onClick} qi={qi} title={deckSelected["title"]} questions={deckSelected["questions"]} />
             </React.Fragment>
         )
     }
@@ -251,7 +251,7 @@ function StartLecture() {
                 {inputRoomId != "" && <div><p>Scan QR code to get started</p><img src={"https://api.qrserver.com/v1/create-qr-code/?data=" + generate_join_url(inputRoomId) + "&amp;size=200x200"} /> <p>(or visit this <a href={generate_join_url(inputRoomId)}>url</a>)</p></div>}
 
 
-                <p>Question Statistics</p>
+                <p>Responses</p>
 
                 <div className={styles.stats}>
                     <p className={styles.letter}>A: {answerData["A"]}</p>

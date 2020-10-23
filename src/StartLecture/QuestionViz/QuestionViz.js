@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router"
 import CustomNavbar from "../../CustomNavbar/CustomNavbar"
@@ -6,7 +6,6 @@ import CustomNavbar from "../../CustomNavbar/CustomNavbar"
 import styles from "./QuestionViz.module.css"
 
 function QuestionViz(props) {
-
 
     return (
         <React.Fragment>
@@ -19,6 +18,19 @@ function QuestionViz(props) {
                                 <p>Select a deck to get started</p>
                             </div>
                             <div className={styles.toggleContainer}><img src={require("../../res/forward.png")}></img></div>
+                        </div>
+                    </React.Fragment>
+                    : props.client ? //don't show the toggle forward/backward buttons on the client end, instructor controls that.
+                    <React.Fragment>
+                        <div className={styles.container}>
+                            <div className={styles.cardClient}>
+                                <p>{props.title}</p>
+                                <p>{props.questions[props.qi].question}</p>
+                                <p>A: {props.questions[props.qi].A}</p>
+                                <p>B: {props.questions[props.qi].B}</p>
+                                <p>C: {props.questions[props.qi].C}</p>
+                                <p>D: {props.questions[props.qi].D}</p>
+                            </div>
                         </div>
                     </React.Fragment>
                     : <React.Fragment>

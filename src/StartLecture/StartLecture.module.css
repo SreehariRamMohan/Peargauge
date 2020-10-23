@@ -31,7 +31,7 @@
     flex-direction: row;
     width: 100%;
     justify-content: space-between;
-    padding-right: 3rem;
+    padding-right: rem;
     padding-left: 3rem;
 
 }
