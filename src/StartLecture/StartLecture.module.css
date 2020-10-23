@@ -4,6 +4,7 @@
     justify-content: center;
     align-items: center;
     font-size: calc(10px + 2vmin);
+    padding-top: 1rem;
 }
 
 .button {
@@ -19,4 +20,18 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
+}
+
+.selectBox {
+    font-size: 1.75rem;
+}
+
+.badgeContainer {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    padding-right: 3rem;
+    padding-left: 3rem;
+
 }

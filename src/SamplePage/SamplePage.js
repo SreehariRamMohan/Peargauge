@@ -32,6 +32,7 @@ function SamplePage() {
     useEffect(() => {
         
         socket.on("connect", function () {
+            console.log("socket connection made -->")
             socket.emit("join", id)
             console.log("Client joining the room", id)
         })
@@ -43,7 +44,7 @@ function SamplePage() {
 
         socket.on("initQuestion", function(question) {
             console.log("here in init question question received is", question, "current question", currentQuestion)
-            if (Object.keys(currentQuestion).length === 0) {
+            if (Object.keys(currentQuestion).length == 0) {
                 setCurrentQuestion(question)
                 console.log("initializing first question with", question)
             }

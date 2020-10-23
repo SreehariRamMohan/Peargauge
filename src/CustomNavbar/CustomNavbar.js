@@ -7,7 +7,7 @@ import styles from './CustomNavbar.module.css';
 function CustomNavbar(props) {
     return (
         <div className={styles.navBarContainer}>
-            <p className={styles.text}>🍐 Peargauge</p>
+            <p className={styles.text}><Link className={styles.text} to={"/home"}>{"🍐 Peargauge"}</Link></p>
             <p ><Link className={styles.text} to={"/logout"}>{"Logout"}</Link></p>
         </div>
         // <Navbar bg="light" expand="lg">
