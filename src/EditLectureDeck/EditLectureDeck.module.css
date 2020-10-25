@@ -1,11 +1,12 @@
 
 .container {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
     font-size: calc(10px + 2vmin);
     padding-top: 2rem;
+    padding-left: 2rem;
 }
 
 .title {

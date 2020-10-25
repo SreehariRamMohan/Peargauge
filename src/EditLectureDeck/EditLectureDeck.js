@@ -6,35 +6,18 @@ import Question from "./Question/Question"
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
+import { Tab, Row, Col, Nav } from "react-bootstrap"
 
-import styles from "./CreateLectureDeck.module.css"
+import styles from "./EditLectureDeck.module.css"
 
 import { URL } from "../Redux/constants"
 
 const axios = require("axios")
 
-function CreateLectureDeck() {
+function EditLectureDeck() {
     const [title, setTitle] = useState("")
     const [numQuestions, setNumQuestions] = useState(0)
     const [questionContent, setQuestionContent] = useState({})
-
-    /** questionContent structure
-     * {
-     * "1": {
-     *      question: ""
-     *      "A": ""
-     *      "B": ""
-     *      "C": ""
-     *      "D": ""
-     *      correct: ""
-     *      }
-     *      ....
-     * 
-     * "2": {
-     * .... .....
-     * }
-     * }
-     */
 
     function addQuestion() {
         let newState = { ...questionContent }
@@ -79,22 +62,35 @@ function CreateLectureDeck() {
         <React.Fragment>
             <div className={styles.container}>
 
-                <div className={styles.lectureTitleBox}>
-                    {/* <p>Lecture Title</p> */}
-                    {/* <input placeholder="title" onChange={titleChange}></input> */}
-                    <TextareaAutosize className={styles.title} rowsMin={2} placeholder="Super Awesome Deck Title 🚀" />
-                </div>
+                <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+                    <Row>
+                        <Col sm={3}>
+                            <Nav variant="pills" className="flex-column">
+                                <Nav.Item>
+                                    <Nav.Link eventKey="first">Deck 1</Nav.Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link eventKey="second">Deck 2</Nav.Link>
+                                </Nav.Item>
+                            </Nav>
+                        </Col>
+                        <Col sm={9}>
+                            <Tab.Content>
+                                <Tab.Pane eventKey="first">
+                                    <div className={styles.lectureTitleBox}>
+                                        <TextareaAutosize className={styles.title} rowsMin={2} placeholder="Super Awesome Deck Title 🚀" />
+                                    </div>
+                                </Tab.Pane>
+                                <Tab.Pane eventKey="second">
+                                    <div className={styles.lectureTitleBox}>
+                                        <TextareaAutosize className={styles.title} rowsMin={2} placeholder="Super Awesome Deck Title 🚀" />
+                                    </div>
+                                </Tab.Pane>
+                            </Tab.Content>
+                        </Col>
+                    </Row>
+                </Tab.Container>
 
-                {
-                    Array.from(Array(numQuestions)).map((value, index, arr) => {
-                        return <Question questionNumber={index + 1} updateFunction={questionUpdate} />
-                    })
-                }
-
-                <div className={styles.bottomButtonBox} >
-                    <button className={styles.addButton} onClick={addQuestion}><AddIcon fontSize="large"/> New Question</button>
-                    {/* <button onClick={saveQuestions}>Save</button> */}
-                </div>
 
 
             </div>
@@ -104,5 +100,5 @@ function CreateLectureDeck() {
     )
 }
 
-export default withRouter(CreateLectureDeck);
+export default withRouter(EditLectureDeck);
 
