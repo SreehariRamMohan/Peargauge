@@ -2,6 +2,7 @@ import time
 import json
 from flask import Flask, jsonify
 from flask_pymongo import PyMongo, pymongo
+from pymongo.collection import ReturnDocument
 from flask import request, Flask, send_from_directory
 from bson.objectid import ObjectId
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
@@ -121,10 +122,23 @@ def serve(path):
 @app.route("/api/createDeck", methods=["POST"])
 def create_deck():
     title = request.json["title"]
+
+    mongo_user_id = request.json["mongo_id"]
+    deck_id = request.json["deck_id"]
+
     deck = {
+        "_id": deck_id,
         "title": title,
         "questions": request.json["questions"]
     }
+
+    returned_document = mongo.db.users.find_one_and_update(
+                            filter={"_id": ObjectId(mongo_user_id)},
+                            update={"$addToSet": {"decks": deck_id}},
+                            upsert=False,
+                            return_document=ReturnDocument.AFTER
+                        )
+    print("Created deck and the returned document is", returned_document)
     mongo.db.sets.insert_one(deck)
     return jsonify({"status": "success"})
 
@@ -164,6 +178,18 @@ def get_deck():
     # ObjectId is not by default serializable to json
     return jsonify({"deck": json.dumps(deck, default=str)})
 
+# verify the validity of a jwt token
+@app.route("/api/verify", methods=['POST'])
+@jwt_required
+def verify():
+    current_user = get_jwt_identity()
+    print("current user is", current_user)
+
+    if current_user:
+        return jsonify({"status": "valid"}), 200
+    else:
+        return jsonify({"status": "invalid"}), 401 
+
 @app.route("/api/createUser", methods=["POST"])
 def create_user():
     username = request.json["username"]
@@ -175,9 +201,13 @@ def create_user():
         "password": pw_hash
     }
     try:
-        mongo.db.users.insert_one(user)
-        access_token = create_access_token(identity=username)
-        return jsonify(access_token=access_token), 201
+        mongo_id = mongo.db.users.insert_one(user).inserted_id
+        ret = {
+            'access_token': create_access_token(identity=username),
+            'refresh_token': create_refresh_token(identity=username),
+            'mongo_id': mongo_id
+        }
+        return json.dumps(ret, default=str), 200
     except pymongo.errors.DuplicateKeyError: 
         return {'status': "failure, duplicate username exists"}
 
@@ -186,14 +216,17 @@ def login_user():
     username = request.json["username"]
     password = request.json["password"]
 
-    password_hash = mongo.db.users.find_one({"username": username})["password"]
+    mongo_user = mongo.db.users.find_one({"username": username})
+    password_hash = mongo_user["password"]
+    mongo_id = mongo_user["_id"]
 
     if bcrypt.check_password_hash(password_hash, password):
         ret = {
             'access_token': create_access_token(identity=username),
-            'refresh_token': create_refresh_token(identity=username)
+            'refresh_token': create_refresh_token(identity=username),
+            'mongo_id': mongo_id
         }
-        return jsonify(ret), 200
+        return json.dumps(ret, default=str), 200
     else:
         return {'status': "incorrect username or password"}, 404
 

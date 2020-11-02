@@ -24,8 +24,15 @@ function Question(props) {
 
     const [questionData, setQuestionData] = useState(initalQuestionData)
 
+    function handleCheck(event, type, letter) {
+        let update = { ...questionData }
+        update[type + ""] = letter
+        setQuestionData(update)
+        props.updateFunction(props.questionNumber, update)
+    }
+    
     function onChange(event, type) {
-        // console.log(props.questionNumber,":",type, ":", event.target.value)
+        //console.log(props.questionNumber,":",type, ":", event.target)
         let update = { ...questionData }
         update[type + ""] = event.target.value
         setQuestionData(update)
@@ -46,12 +53,12 @@ function Question(props) {
                 <div className={styles.mContainer}>
 
                     <div className={styles.optionBox}>
-                        <Checkbox icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
+                        <Checkbox onChange={(e) => handleCheck(e, "correct", "A")} checked={questionData["correct"] == "A"} icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
                         <TextareaAutosize onChange={(e) => onChange(e, "A")} className={styles.option} placeholder="Option A 🎃" />
                     </div>
 
                     <div className={styles.optionBox}>
-                        <Checkbox icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
+                        <Checkbox onChange={(e) => handleCheck(e, "correct", "B")} checked={questionData["correct"] == "B"} icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
                         <TextareaAutosize onChange={(e) => onChange(e, "B")} className={styles.option} placeholder="Option B 🐶" />
                     </div>
                     {/* <input onChange={(e) => onChange(e, "A")} placeholder="Option A"></input> */}
@@ -61,10 +68,10 @@ function Question(props) {
                     {/* <input onChange={(e) => onChange(e, "C")} placeholder="Option C"></input>
                     <input onChange={(e) => onChange(e, "D")} placeholder="Option D"></input> */}
                     <div className={styles.optionBox}>
-                        <Checkbox icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
+                        <Checkbox onChange={(e) => handleCheck(e, "correct", "C")} checked={questionData["correct"] == "C"} icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
                         <TextareaAutosize onChange={(e) => onChange(e, "C")} className={styles.option} placeholder="Option C 🏗️" /></div>
                     <div className={styles.optionBox}>
-                        <Checkbox icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
+                        <Checkbox onChange={(e) => handleCheck(e, "correct", "D")} checked={questionData["correct"] == "D"} icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
                         <TextareaAutosize onChange={(e) => onChange(e, "D")} className={styles.option} placeholder="Option D 🍕" /></div>
                 </div>
 

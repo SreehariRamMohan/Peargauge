@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router"
 import CustomNavbar from "../CustomNavbar/CustomNavbar"
@@ -18,6 +18,11 @@ function EditLectureDeck() {
     const [title, setTitle] = useState("")
     const [numQuestions, setNumQuestions] = useState(0)
     const [questionContent, setQuestionContent] = useState({})
+    const [deckTitles, setDeckTitles] = useState([])
+
+    useEffect(() => {
+        getDeckTitles()
+    }, [])
 
     function addQuestion() {
         let newState = { ...questionContent }
@@ -48,14 +53,36 @@ function EditLectureDeck() {
             .then(data => {
                 // console.log(data)
             })
-
-
-
-
     }
 
     function titleChange(e) {
         setTitle(e.target.value)
+    }
+
+    function getDeckTitles() {
+        axios.get(URL + "/getDeckNames")
+            .then(res => {
+                return res.data
+            })
+            .then(data => {
+                setDeckTitles(data.titles)
+                console.log("Deck titles", data.titles, "generated")
+            })
+    }
+
+    function generateNavItems() {
+        // deckTitles.map((value, index, arr) => {
+        //     return (<Nav.Item>
+        //         <Nav.Link eventKey="first">{value}</Nav.Link>
+        //     </Nav.Item>)
+        // })
+        return (<><Nav.Item>
+            <Nav.Link eventKey="first">Deck 1</Nav.Link>
+        </Nav.Item>
+            <Nav.Item>
+                <Nav.Link eventKey="second">Deck 2</Nav.Link>
+            </Nav.Item></>)
+
     }
 
     return (
@@ -63,15 +90,20 @@ function EditLectureDeck() {
             <div className={styles.container}>
 
                 <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+
                     <Row>
                         <Col sm={3}>
                             <Nav variant="pills" className="flex-column">
-                                <Nav.Item>
-                                    <Nav.Link eventKey="first">Deck 1</Nav.Link>
-                                </Nav.Item>
-                                <Nav.Item>
-                                    <Nav.Link eventKey="second">Deck 2</Nav.Link>
-                                </Nav.Item>
+
+                                {
+                                deckTitles.map((value, index, arr) => {
+                                    return (<Nav.Item>
+                                            <Nav.Link eventKey="first">{value}</Nav.Link>
+                                                </Nav.Item>)
+                                })
+                                }
+
+
                             </Nav>
                         </Col>
                         <Col sm={9}>

@@ -26,9 +26,17 @@
     border-radius: 2rem;
 }
 
+.left {
+    flex: 2
+}
+
 .bottomButtonBox {
     display: flex;
     flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    padding-left: 5rem;
+    padding-right: 5rem;
 }
 
 .addButton {
@@ -40,4 +48,5 @@
     align-items: center;
     background: whitesmoke;
     border: 0;
+    
 }

@@ -1,4 +1,4 @@
-import {SAMPLE_ACTION, SET_JWT} from "./constants"
+import {SAMPLE_ACTION, SET_JWT, SET_MONGO_ID} from "./constants"
 
 export function test_redux(data) {
     return {
@@ -11,5 +11,12 @@ export function set_jwt_token(token) {
     return {
         type: SET_JWT,
         data: token
+    }
+}
+
+export function set_mongo_id(id) {
+    return {
+        type: SET_MONGO_ID,
+        data: id
     }
 }

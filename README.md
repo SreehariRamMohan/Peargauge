@@ -23,4 +23,4 @@ Photo/Media Credits
 
 Deployed on Heroku
 
-Run backend with python server.py
+Run backend with python server.py (not flask run because flask-socketio requires you to run the server with python server.py)

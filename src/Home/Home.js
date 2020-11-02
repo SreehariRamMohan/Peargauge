@@ -35,9 +35,12 @@ function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [sessionCode, setSessionCode] = useState("")
   const history = useHistory();
+  const jwt_token = useSelector((state) => state.jwt_token);
+  const mongo_id = useSelector((state) => state.mongo_id)
 
   useEffect(() => {
-
+    console.log("The jwt token is", jwt_token)
+    console.log("The mongo id is",  mongo_id)
   }, []);
 
   function onClick(type) {

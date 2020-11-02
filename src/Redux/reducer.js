@@ -1,13 +1,14 @@
 import produce from "immer"
 import {enableAllPlugins} from "immer"
 
-import {SAMPLE_ACTION, SET_JWT} from "./constants"
+import {SAMPLE_ACTION, SET_JWT, SET_MONGO_ID} from "./constants"
 
 enableAllPlugins()
 
 const initialState = {
     sampleData: "",
-    jwt_token: ""
+    jwt_token: "",
+    mongo_id: ""
 }
 
 export default function reducer(state = initialState, action) {
@@ -22,6 +23,11 @@ export default function reducer(state = initialState, action) {
 
         case SET_JWT: {
           draft.jwt_token = action.data;
+          return draft;
+        }
+
+        case SET_MONGO_ID: {
+          draft.mongo_id = action.data
           return draft;
         }
   

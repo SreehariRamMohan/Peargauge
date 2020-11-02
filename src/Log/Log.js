@@ -6,11 +6,11 @@ import { Card, Nav, Button, Form, Row, Col } from "react-bootstrap"
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { set_jwt_token } from "../Redux/actions"
+import { set_jwt_token, set_mongo_id } from "../Redux/actions"
 
 import styles from './Log.module.css';
 import svg from "../res/peargauge-background_03.svg"
-import { URL } from "../Redux/constants"
+import { URL, AUTO_LOG_IN } from "../Redux/constants"
 
 const axios = require("axios")
 
@@ -58,12 +58,17 @@ function Log() {
     //         })
     //     },
     // )
-    
+
     useEffect(() => {
         console.log(`URL is ${URL}`)
+
+        if (AUTO_LOG_IN) {
+            onSubmit()
+        }
+
     }, []);
-    
-    
+
+
     function toggle(bool) {
         toggleLoginState(bool)
     }
@@ -73,6 +78,11 @@ function Log() {
         let payload = {
             "username": usernameRef.current.value,
             "password": passwordRef.current.value
+        }
+
+        if (AUTO_LOG_IN) {
+            payload["username"] = "sree"
+            payload["password"] = "sree"
         }
 
         let route = URL + "/loginUser"
@@ -88,10 +98,11 @@ function Log() {
 
                     // store the access token in redux and the refresh token in local storage
                     dispatch(set_jwt_token(access_token))
+                    dispatch(set_mongo_id(res.data["mongo_id"]))
+
                     localStorage.setItem("refresh_token", refresh_token);
 
-                    refresh_token =
-                        history.push("/home");
+                    history.push("/home");
                 }
             })
 
@@ -99,9 +110,9 @@ function Log() {
 
     return (
         <React.Fragment>
+            <CustomNavbar hideLogout={true}/>
             <div
-                className={styles.hero}
-                style={{ backgroundImage: `url(${svg})` }}
+                className={styles.background}
             >
                 <div className={styles.card}>
                     <Card.Header className={styles.cardHeader}>
