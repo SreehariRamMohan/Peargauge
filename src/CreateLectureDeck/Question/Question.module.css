@@ -34,3 +34,17 @@
     justify-content: space-evenly;
     padding-bottom: 2rem;
 }
+
+.radioButtonLabelAlignment {
+    vertical-align: baseline;
+    padding: 3px;
+    margin: 3px;
+}
+
+.exampleText {
+  color: grey;
+}
+
+.exampleText:hover {
+  color: green;
+}
