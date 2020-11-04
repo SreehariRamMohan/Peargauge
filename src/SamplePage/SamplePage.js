@@ -53,6 +53,10 @@ function SamplePage() {
 
     }, [])
 
+    useEffect(() => {
+        setDisabled(false)
+    }, [currentQuestion])
+
     function handleMC(letter) {
         let guessObject = {
             "roomid": id,

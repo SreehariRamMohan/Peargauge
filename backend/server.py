@@ -158,6 +158,16 @@ def update_question():
     roomid = request.json["roomid"]
     question = request.json["question"]
     socketio.emit("updateQuestion", question, room=roomid)
+
+    # once we update the question, let's reset the multiple choice frequency responses
+    reset_guess = {
+        "A": 0,
+        "B": 0,
+        "C": 0,
+        "D": 0
+    }
+    r.set(roomid, json.dumps(reset_guess))
+
     return jsonify({"status": "success"})
 
 @app.route("/api/getDeckNames", methods=['GET'])

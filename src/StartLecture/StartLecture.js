@@ -16,6 +16,20 @@ import { URL, WEBSOCKET_URL, generate_join_url } from "../Redux/constants"
 
 const axios = require("axios")
 
+/*
+
+format of each individual question (this is a latex formatted question)
+
+A: "\lambda^{1}"
+B: "\lambda^{2}"
+C: "\int_0^{\infty} \lambda e^{\frac{x}{\lambda}} dx"
+D: "\text{not convergent ??}"
+correct: ""
+format: "latex"
+question: "\text{find } \mathbb{E}(x) \text{ where X is a Poisson random variable } P\left( x \right) = \frac{{e^{ - \lambda } \lam
+
+*/
+
 function StartLecture() {
 
     const [inputRoomId, setInputRoomId] = useState("")
@@ -38,8 +52,19 @@ function StartLecture() {
     //index of the question we're on
     const [qi, setQi] = useState(0)
 
+    const data = {
+        0: {
+            "A": 0,
+            "B": 0,
+            "C": 0,
+            "D": 0
+        }
+    }
+    
+    const [responseData, setResponseData] = useState(data)
+
     //chart data. A-D is mapped to index 0-3
-    const data = [
+    const initialChartDataForQuestion = [
         {
             name: 'A', responses: 0,
         },
@@ -53,7 +78,9 @@ function StartLecture() {
             name: 'D', responses: 0,
         },
     ];
-    const [chartData, setChartData] = useState(data)
+
+
+    const [formattedChartData, setFormattedChartData] = useState(initialChartDataForQuestion)
 
     useEffect(() => {
         console.log("API URL is", URL, "websocket URL is", WEBSOCKET_URL)
@@ -70,13 +97,20 @@ function StartLecture() {
             console.log("receiving updated student stats:", stats)
             setAnswerData(stats)
 
-            let order = ["A", "B", "C", "D"]
-            let chartDataNew = [...chartData]
-            for (var i = 0; i < order.length; i++) {
-                chartDataNew[i].responses = stats[order[i]]
-            }
-            setChartData(chartDataNew)
-            console.log(chartDataNew)
+            // let chartDataNew = [...responseData]
+            // for (var i = 0; i < order.length; i++) {
+            //     chartDataNew[i].responses = stats[order[i]]
+            // }
+
+            let update = {...responseData}
+
+            //case where we are going to a question for the first time
+            update[qi] = stats
+            
+            setResponseData(update)
+
+            reformatDataForChart(update)
+            // console.log(chartDataNew)
         })
 
         getDeckTitles()
@@ -111,6 +145,47 @@ function StartLecture() {
         }
     }, [deckSelected])
 
+    /*
+    The chart library I am using requires the data in the following format for the current question to display
+    [
+        {
+            name: 'A', responses: 0,
+        },
+        {
+            name: 'B', responses: 0,
+        },
+        {
+            name: 'C', responses: 0,
+        },
+        {
+            name: 'D', responses: 0,
+        },
+    ]
+
+    Our data is in the following format:
+    // {
+    //     0: { <-- where 0 is the qi (current question)
+    //         "A": 0,
+    //         "B": 0,
+    //         "C": 0,
+    //         "D": 0
+    //     }
+    // }
+    */
+    function reformatDataForChart(data) {
+        let formattedData = []
+        
+        let order = ["A", "B", "C", "D"]
+        for (var i = 0; i < order.length; i++) {
+            const letterObject = {
+                "name": order[i],
+                "responses": data[qi][order[i]]
+            }
+            formattedData.push(letterObject)
+        }
+        setFormattedChartData(formattedData)
+
+    }
 
     function updateQuestion() {
         let payload = {
@@ -166,11 +241,31 @@ function StartLecture() {
 
     function onClick(e, type) {
         if (type == "forward") {
-            setQi(Math.min(qi + 1, deckSelected.questions.length - 1))
+            setQi(Math.min(qi + 1, deckSelected.questions.length - 1))            
+            
+            //reset the graph chart data with either new data or previous data 
+            let index = Math.min(qi + 1, deckSelected.questions.length - 1)
+            if ( (index) in responseData ) {
+                setFormattedChartData(responseData[index]) 
+            } else {
+                setFormattedChartData(initialChartDataForQuestion)
+            }
+
         }
         else if (type == "backward") {
             setQi(Math.max(qi - 1, 0))
+
+            //reset the graph chart data with either new data or previous data 
+            let index = Math.max(qi - 1, 0)
+            if ( (index) in responseData ) {
+                setFormattedChartData(responseData[index]) 
+            } else {
+                setFormattedChartData(initialChartDataForQuestion)
+            }
         }
+
+       
+
 
     }
 
@@ -204,7 +299,7 @@ function StartLecture() {
             })
             .then(data => {
                 setDeckSelected(JSON.parse(data["deck"]))
-                console.log("Load deck finished")
+                console.log("Load deck finished, the deck we loaded was:", JSON.parse(data["deck"]))
             })
     }
 
@@ -260,7 +355,7 @@ function StartLecture() {
                     <p className={styles.letter}>D: {answerData["D"]}</p>
                 </div>
 
-                <BarChart width={730} height={250} data={chartData}>
+                <BarChart width={730} height={250} data={formattedChartData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
