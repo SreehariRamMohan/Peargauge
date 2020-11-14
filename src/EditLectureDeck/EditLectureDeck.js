@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import { withRouter } from "react-router"
 import CustomNavbar from "../CustomNavbar/CustomNavbar"
-import Question from "./Question/Question"
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
@@ -10,123 +9,53 @@ import { Tab, Row, Col, Nav } from "react-bootstrap"
 
 import styles from "./EditLectureDeck.module.css"
 
+import DeckTemplate from "./DeckTemplate/DeckTemplate"
+
 import { URL } from "../Redux/constants"
 
 const axios = require("axios")
 
-function EditLectureDeck() {
-    const [title, setTitle] = useState("")
-    const [numQuestions, setNumQuestions] = useState(0)
-    const [questionContent, setQuestionContent] = useState({})
+function EditLectureDeck(props) {
+
     const [deckTitles, setDeckTitles] = useState([])
+    const mongo_id = useSelector((state) => state.mongo_id);
+
 
     useEffect(() => {
         getDeckTitles()
     }, [])
 
-    function addQuestion() {
-        let newState = { ...questionContent }
-        newState["" + numQuestions + 1] = {}
-        setNumQuestions(numQuestions + 1)
-    }
-
-    function questionUpdate(questionNumber, update) {
-        let newState = { ...questionContent }
-        newState["" + questionNumber] = { ...newState["" + questionNumber], ...update }
-        setQuestionContent(newState)
-    }
-
-    function saveQuestions() {
-        //convert the dictionary like structure in questionContent to a list
-        let questions = []
-        for (var i = 0; i < numQuestions; i++) {
-            questions.push(questionContent[i + 1 + ""])
-        }
-
-        let payload = {
-            "title": title,
-            "questions": questions
-        }
-
-        axios.post(URL + "/createDeck", payload)
-            .then(res => { return res.data })
-            .then(data => {
-                // console.log(data)
-            })
-    }
-
-    function titleChange(e) {
-        setTitle(e.target.value)
-    }
-
     function getDeckTitles() {
-        axios.get(URL + "/getDeckNames")
+
+        axios.post(URL + "/getDeckNames", {
+            "mongo_id": mongo_id
+        })
             .then(res => {
                 return res.data
             })
             .then(data => {
-                setDeckTitles(data.titles)
-                console.log("Deck titles", data.titles, "generated")
+                let titles_uids = []
+                for (var i = 0; i < data.titles.length; i++) {
+                    titles_uids.push([data.titles[i], data.uids[i]]) // push the deck titles and uids into the deckTitles list. 
+                }
+
+                setDeckTitles(titles_uids)
+                // console.log("Deck titles", titles_uids, "generated")
             })
-    }
-
-    function generateNavItems() {
-        // deckTitles.map((value, index, arr) => {
-        //     return (<Nav.Item>
-        //         <Nav.Link eventKey="first">{value}</Nav.Link>
-        //     </Nav.Item>)
-        // })
-        return (<><Nav.Item>
-            <Nav.Link eventKey="first">Deck 1</Nav.Link>
-        </Nav.Item>
-            <Nav.Item>
-                <Nav.Link eventKey="second">Deck 2</Nav.Link>
-            </Nav.Item></>)
-
     }
 
     return (
         <React.Fragment>
-            <div className={styles.container}>
-
-                <Tab.Container id="left-tabs-example" defaultActiveKey="first">
-
-                    <Row>
-                        <Col sm={3}>
-                            <Nav variant="pills" className="flex-column">
-
-                                {
-                                deckTitles.map((value, index, arr) => {
-                                    return (<Nav.Item>
-                                            <Nav.Link eventKey="first">{value}</Nav.Link>
-                                                </Nav.Item>)
-                                })
-                                }
-
-
-                            </Nav>
-                        </Col>
-                        <Col sm={9}>
-                            <Tab.Content>
-                                <Tab.Pane eventKey="first">
-                                    <div className={styles.lectureTitleBox}>
-                                        <TextareaAutosize className={styles.title} rowsMin={2} placeholder="Super Awesome Deck Title 🚀" />
-                                    </div>
-                                </Tab.Pane>
-                                <Tab.Pane eventKey="second">
-                                    <div className={styles.lectureTitleBox}>
-                                        <TextareaAutosize className={styles.title} rowsMin={2} placeholder="Super Awesome Deck Title 🚀" />
-                                    </div>
-                                </Tab.Pane>
-                            </Tab.Content>
-                        </Col>
-                    </Row>
-                </Tab.Container>
-
-
-
+            <div className="container">
+                <div className="row">
+                    {deckTitles.map((value, index, arr) => {
+                        return (
+                            <div className="col-4 p-3">
+                                {<DeckTemplate title={value[0]} uid={value[1]} onEdit={props.onEdit}/>}
+                            </div>)
+                    })}
+                </div>
             </div>
-
 
         </React.Fragment>
     )

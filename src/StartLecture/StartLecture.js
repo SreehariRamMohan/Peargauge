@@ -1,5 +1,5 @@
 import React, { useState, useEffect, PureComponent } from "react";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import { withRouter } from "react-router"
 import CustomNavbar from "../CustomNavbar/CustomNavbar"
 import styles from "./StartLecture.module.css"
@@ -62,6 +62,8 @@ function StartLecture() {
     }
     
     const [responseData, setResponseData] = useState(data)
+
+    const mongo_id = useSelector((state) => state.mongo_id)
 
     //chart data. A-D is mapped to index 0-3
     const initialChartDataForQuestion = [
@@ -270,11 +272,12 @@ function StartLecture() {
     }
 
     function getDeckTitles() {
-        axios.get(URL + "/getDeckNames")
+        axios.post(URL + "/getDeckNames", {"mongo_id": mongo_id})
             .then(res => {
                 return res.data
             })
             .then(data => {
+                console.log("received deck names", data)
                 setDeckTitles(data.titles)
             })
     }

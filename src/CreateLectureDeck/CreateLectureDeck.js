@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect, useSelector } from "react-redux";
 import { withRouter } from "react-router"
 import CustomNavbar from "../CustomNavbar/CustomNavbar"
@@ -15,7 +15,7 @@ import { URL } from "../Redux/constants"
 
 const axios = require("axios")
 
-function CreateLectureDeck() {
+function CreateLectureDeck(props) {
     const [title, setTitle] = useState("")
     const [numQuestions, setNumQuestions] = useState(0)
     const [questionContent, setQuestionContent] = useState({})
@@ -23,6 +23,15 @@ function CreateLectureDeck() {
     const [deckId, setDeckId] = useState(uuidv4())
     const mongo_id = useSelector((state) => state.mongo_id);
 
+    useEffect(() => {
+        if (props.edit_deck_uid != "" && props.edit_deck_uid != deckId) {
+            console.log("Value of props.edit_deck_uid changed to ", props.edit_deck_uid)
+
+            // load the current deck for editing
+            setDeckId(props.edit_deck_uid)
+            
+        }
+    }, [props.edit_deck_uid])
     /** questionContent structure
      * {
      * "1": {

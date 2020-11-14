@@ -59,13 +59,13 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # client will send the room uid in the key "roomid"
 @socketio.on("join")
 def on_join(roomid):
-    print(f"Adding client to room {roomid} on server side")
+    # print(f"Adding client to room {roomid} on server side")
     #print(request.sid)
     join_room(roomid)
-    print(r.exists(f"{roomid}:current_question"))
+    # print(r.exists(f"{roomid}:current_question"))
     if (r.exists(f"{roomid}:current_question")):
         emit("initQuestion", json.loads(r.get(f"{roomid}:current_question")))
-        print("sending initial question to client who just joined")
+        # print("sending initial question to client who just joined")
 
 """
 guess object:
@@ -88,7 +88,7 @@ def on_guess(guess):
         }
         init_guess[letter] += 1
         r.set(roomid, json.dumps(init_guess))
-        print(f"in guess: printing the value of r.get(roomid) {json.loads(r.get(roomid))}")
+        # print(f"in guess: printing the value of r.get(roomid) {json.loads(r.get(roomid))}")
     else:
         guesses = json.loads(r.get(roomid))
         guesses[letter] += 1
@@ -96,11 +96,11 @@ def on_guess(guess):
     
     # update the teacher with the latest student guesses by sending her the latest dict via her socket
     teacher_room_id = r.get(f"{roomid}:teacher").decode("utf-8")
-    print(f"trying to updateGuess to teacher's room {teacher_room_id}")
+    # print(f"trying to updateGuess to teacher's room {teacher_room_id}")
     emit("updateGuess", json.loads(r.get(roomid)), room=r.get(f"{roomid}:teacher").decode("utf-8"))
 
     # print("request object is", request)
-    print(f"** client {request.sid} guessed {guess}")
+    # print(f"** client {request.sid} guessed {guess}")
 
 
 
@@ -138,7 +138,7 @@ def create_deck():
                             upsert=False,
                             return_document=ReturnDocument.AFTER
                         )
-    print("Created deck and the returned document is", returned_document)
+    # print("Created deck and the returned document is", returned_document)
     mongo.db.sets.insert_one(deck)
     return jsonify({"status": "success"})
 
@@ -170,21 +170,27 @@ def update_question():
 
     return jsonify({"status": "success"})
 
-@app.route("/api/getDeckNames", methods=['GET'])
+@app.route("/api/getDeckNames", methods=['POST'])
 def get_deck_name():
-    decks = mongo.db.sets.find({})
-    print(decks)
-    titles = []
-    for deck in decks:
-        print(deck)
-        titles.append(deck["title"])
+    mongo_id = request.json["mongo_id"]
+    user = mongo.db.users.find_one({"_id": ObjectId(mongo_id)})
+    user_decks = user["decks"]
+        
+    user_deck_names = []
+    user_deck_uids = []
+    
 
-    return jsonify({"titles": titles})
+    for deck_uid in user_decks:
+        deck = mongo.db.sets.find_one({"_id": deck_uid})
+        user_deck_names.append(deck["title"])
+        user_deck_uids.append(deck_uid)
+
+    return jsonify({"titles": user_deck_names, "uids": user_deck_uids})
 
 @app.route("/api/getDeck", methods=['POST'])
 def get_deck():
     deck = mongo.db.sets.find_one({"title": request.json["title"]})
-    print("deck found on the backend is", deck)
+    # print("deck found on the backend is", deck)
     # ObjectId is not by default serializable to json
     return jsonify({"deck": json.dumps(deck, default=str)})
 
@@ -193,7 +199,7 @@ def get_deck():
 @jwt_required
 def verify():
     current_user = get_jwt_identity()
-    print("current user is", current_user)
+    # print("current user is", current_user)
 
     if current_user:
         return jsonify({"status": "valid"}), 200
@@ -261,7 +267,7 @@ def get_current_time():
 @app.route('/api/user/<id>', methods=['GET'])
 def get_user(id):
     user = mongo.db.sample.find_one({"_id": ObjectId(id)})
-    print(user)
+    # print(user)
     return json.dumps(user, default=str)
 
 

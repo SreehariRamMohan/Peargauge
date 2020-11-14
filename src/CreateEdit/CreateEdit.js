@@ -10,6 +10,18 @@ import styles from "./CreateEdit.module.css"
 
 function CreateEdit() {
     const [key, setKey] = useState('create');
+
+    const [deckUID, setDeckUID] = useState("")
+
+    // called from the edit tab, transition to the create tab
+    // pass along the deck uid, generate exisiting questions to allow for easy editing. 
+    function edit_particular_deck(deck_uid) {
+        console.log("Switching tabs deck uid is", deck_uid )
+        setDeckUID(deck_uid)
+        setKey("create")
+    }
+
+
     return (
         <React.Fragment>
             <CustomNavbar />
@@ -19,11 +31,11 @@ function CreateEdit() {
             activeKey={key}
             onSelect={(k) => setKey(k)}
         >
-            <Tab eventKey="create" title="Create Deck">
-                <CreateLectureDeck />
+            <Tab eventKey="create" title="Create/Edit Deck">
+                <CreateLectureDeck edit_deck_uid={deckUID} />
             </Tab>
-            <Tab eventKey="edit" title="Edit Deck">
-                <EditLectureDeck />
+            <Tab eventKey="edit" title="My Decks">
+                <EditLectureDeck onEdit={edit_particular_deck}/>
             </Tab>
         </Tabs>
         </React.Fragment>
