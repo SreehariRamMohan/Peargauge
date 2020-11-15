@@ -44,6 +44,21 @@ function EditLectureDeck(props) {
             })
     }
 
+    function delete_deck(deck_id) {
+        // remove from deckTitles
+        var deckTitlesCopy = [...deckTitles]
+        for (var i = 0; i < deckTitlesCopy.length; i++) {
+            if (deckTitlesCopy[i][1] == deck_id) {
+                var deletedDeck = deckTitlesCopy.splice(i, 1)
+                setDeckTitles(deckTitlesCopy)
+                break
+            }
+        }
+
+        //TODO: delete deck_id from mongodb
+
+    }
+
     return (
         <React.Fragment>
             <div className="container">
@@ -51,7 +66,7 @@ function EditLectureDeck(props) {
                     {deckTitles.map((value, index, arr) => {
                         return (
                             <div className="col-4 p-3">
-                                {<DeckTemplate title={value[0]} uid={value[1]} onEdit={props.onEdit}/>}
+                                {<DeckTemplate title={value[0]} uid={value[1]} onEdit={props.onEdit} onDelete={delete_deck}/>}
                             </div>)
                     })}
                 </div>

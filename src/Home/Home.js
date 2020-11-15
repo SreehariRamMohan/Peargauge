@@ -100,7 +100,7 @@ function Home() {
                   </Popover>
                 }
               >
-                <div onClick={() => onClick("jocin")}>
+                <div>
                   <div className={styles.logoWrapper}>
                     <img src={require("../res/join-small-white.png")}></img>
                   </div>

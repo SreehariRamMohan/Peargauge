@@ -28,10 +28,40 @@ function CreateLectureDeck(props) {
             console.log("Value of props.edit_deck_uid changed to ", props.edit_deck_uid)
 
             // load the current deck for editing
-            setDeckId(props.edit_deck_uid)
-            
+            fetch_deck(props.edit_deck_uid)
         }
     }, [props.edit_deck_uid])
+
+    function fetch_deck(deck_id) {
+        let payload = {
+            "mongo_id": mongo_id,
+            "deck_id": deck_id
+        }
+        axios.post(URL + "/getDeck2", payload)
+            .then(res => { return res.data })
+            .then(data => {
+                if (data.status == "success") {
+                    
+                    setTitle(data.deck.title)
+
+                    console.log("loading up the deck", data.deck.title)
+                    
+                    //convert the list like format of the questions to a dictionary which we use internally. 
+                    
+                    //res.data.deck.questions
+                    let questionContent = {}
+                    for (var i = 0; i < data.deck.questions.length; i++) {
+                        questionContent[(i+1) + ""] = data.deck.questions[i]
+                    }
+
+                    setQuestionContent(questionContent)
+                    setDeckId(data.deck["_id"])
+
+                }
+            })
+    }
+
+
     /** questionContent structure
      * {
      * "1": {
@@ -51,10 +81,23 @@ function CreateLectureDeck(props) {
      */
 
     function addQuestion() {
+
         let newState = { ...questionContent }
-        newState["" + numQuestions + 1] = {}
+        newState["" + numQuestions + 1] = {
+            "question": "",
+            "A": "",
+            "B": "",
+            "C": "",
+            "D": "",
+            "correct": "",
+            "format": "text" //if "latex" we format with latex
+        }
+        setQuestionContent(newState)
+
         setNumQuestions(numQuestions + 1)
     }
+
+    
 
     function questionUpdate(questionNumber, update) {
         let newState = { ...questionContent }
@@ -65,10 +108,13 @@ function CreateLectureDeck(props) {
     function saveQuestions() {
 
         setSaving(true)
+        
         //convert the dictionary like structure in questionContent to a list
+
         let questions = []
-        for (var i = 0; i < numQuestions; i++) {
-            questions.push(questionContent[i + 1 + ""])
+        let keys = Object.keys(questionContent)
+        for (var i = 0; i < keys.length; i++) {
+            questions.push(questionContent[keys[i]])
         }
 
         let payload = {
@@ -78,7 +124,7 @@ function CreateLectureDeck(props) {
             "deck_id": deckId
         }
 
-        axios.post(URL + "/createDeck", payload)
+        axios.post(URL + "/createDeck", payload) // This will also edit an existing deck 
             .then(res => { return res.data })
             .then(data => {
                 // console.log(data)
@@ -97,12 +143,18 @@ function CreateLectureDeck(props) {
                 <div className={styles.lectureTitleBox}>
                     {/* <p>Lecture Title</p> */}
                     {/* <input placeholder="title" onChange={titleChange}></input> */}
-                    <TextareaAutosize className={styles.title} onChange={titleChange} rowsMin={2} placeholder="Super Awesome Deck Title 🚀" />
+                    <TextareaAutosize value={title} className={styles.title} onChange={titleChange} rowsMin={2} placeholder="Super Awesome Deck Title 🚀" />
                 </div>
 
-                {
+                {/* {
                     Array.from(Array(numQuestions)).map((value, index, arr) => {
                         return <Question questionNumber={index + 1} updateFunction={questionUpdate} />
+                    })
+                } */}
+
+                {
+                    Object.keys(questionContent).map((value, index, arr) => {
+                        return <Question questionNumber={value} questionStateDict={questionContent[value]} updateFunction={questionUpdate} />
                     })
                 }
 

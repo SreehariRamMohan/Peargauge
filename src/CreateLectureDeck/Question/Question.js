@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router"
 import CustomNavbar from "../../CustomNavbar/CustomNavbar"
@@ -19,42 +19,51 @@ const tex = `f(x) = \\int_{-\\infty}^\\infty\\hat f(\\xi)\\,e^{2 \\pi i \\xi x}\
 
 function Question(props) {
 
-    let initalQuestionData = {
-        "question": "",
-        "A": "",
-        "B": "",
-        "C": "",
-        "D": "",
-        "correct": "",
-        "format": "text" //if "latex" we format with latex
-    }
+    // let initalQuestionData = {
+    //     "question": "",
+    //     "A": "",
+    //     "B": "",
+    //     "C": "",
+    //     "D": "",
+    //     "correct": "",
+    //     "format": "text" //if "latex" we format with latex
+    // }
 
-    const [questionData, setQuestionData] = useState(initalQuestionData)
+    // const [questionData, setQuestionData] = useState(initalQuestionData)
+    useEffect(() => {
+        console.log("In the question react component, props.questionStateDict=", props.questionStateDict)
+    }, [props.questionStateDict])
+
 
     function handleCheck(event, type, letter) {
-        let update = { ...questionData }
+        let update = { ...props.questionStateDict }
         update[type + ""] = letter
-        setQuestionData(update)
+        // setQuestionData(update)
         props.updateFunction(props.questionNumber, update)
     }
 
     function handleRadioChange(event) {
         console.log("radio button status:", event.target.value)
-        questionData["format"] = event.target.value
+        
+        let update = { ...props.questionStateDict }
+        update["format"] = event.target.value
+        props.updateFunction(props.questionNumber, update)
     }
 
     function onChange(event, type) {
         //console.log(props.questionNumber,":",type, ":", event.target)
-        let update = { ...questionData }
+        // let update = { ...questionData }
+        let update = { ...props.questionStateDict }
         update[type + ""] = event.target.value
-        setQuestionData(update)
+        // setQuestionData(update)
         props.updateFunction(props.questionNumber, update)
     }
 
     function showQuestionExample(questionType) {
         if (questionType == "text") {
             const textQuestion = "Who was the 23rd president of the United States?"
-            let update = { ...questionData }
+
+            let update = { ...props.questionStateDict }
 
             update["question"] = textQuestion
             update["A"] = "Herbert Hoover"
@@ -65,12 +74,14 @@ function Question(props) {
             // set the question render format to text, to remove the latex rendering
             update["format"] = "text"
 
-            setQuestionData(update)
+            // setQuestionData(update)        
             props.updateFunction(props.questionNumber, update)
 
         } else if (questionType == "latex") {
             const latexQuestion = "\\text{find } \\mathbb{E}(x) \\text{ where X is a Poisson random variable } P\\left( x \\right) = \\frac{{e^{ - \\lambda } \\lambda ^x }}{{x!}}"
-            let update = { ...questionData }
+            // let update = { ...questionData }
+
+            let update = { ...props.questionStateDict }
 
             update["question"] = latexQuestion
             update["A"] = "\\lambda^{1}"
@@ -81,7 +92,7 @@ function Question(props) {
             // set the question render format to latex, to add the latex rendering box
             update["format"] = "latex"
 
-            setQuestionData(update)
+            // setQuestionData(update)
             props.updateFunction(props.questionNumber, update)
         }
     }
@@ -89,15 +100,15 @@ function Question(props) {
     return (
         <React.Fragment>
             <div className={styles.card}>
-                {questionData["format"] == "latex" && <div>
+                {props.questionStateDict["format"] == "latex" && <div>
                     <MathJax.Context input='tex'>
                         <div>
-                            <MathJax.Node>{questionData["question"]}</MathJax.Node>
+                            <MathJax.Node>{props.questionStateDict["question"]}</MathJax.Node>
                         </div>
                     </MathJax.Context>
                 </div>}
 
-                <TextareaAutosize value={questionData["question"]} onChange={(e) => onChange(e, "question")} className={styles.question} rowsMin={2} placeholder="Question... normal text or Latex supported 🐳" />
+                <TextareaAutosize value={props.questionStateDict["question"]} onChange={(e) => onChange(e, "question")} className={styles.question} rowsMin={2} placeholder="Question... normal text or Latex supported 🐳" />
 
                 <div className="p-3">
                     <FormControl component="fieldset" >
@@ -114,31 +125,31 @@ function Question(props) {
 
 
                     <div className="d-flex flex-column">
-                        {questionData["format"] == "latex" && <div>
+                        {props.questionStateDict["format"] == "latex" && <div>
                             <MathJax.Context input='tex'>
                                 <div>
-                                    <MathJax.Node>{questionData["A"]}</MathJax.Node>
+                                    <MathJax.Node>{props.questionStateDict["A"]}</MathJax.Node>
                                 </div>
                             </MathJax.Context>
                         </div>}
 
                         <div className={styles.optionBox}>
-                            <Checkbox onChange={(e) => handleCheck(e, "correct", "A")} checked={questionData["correct"] == "A"} icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
-                            <TextareaAutosize value={questionData["A"]} onChange={(e) => onChange(e, "A")} className={styles.option} placeholder="Option A 🎃" />
+                            <Checkbox onChange={(e) => handleCheck(e, "correct", "A")} checked={props.questionStateDict["correct"] == "A"} icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
+                            <TextareaAutosize value={props.questionStateDict["A"]} onChange={(e) => onChange(e, "A")} className={styles.option} placeholder="Option A 🎃" />
                         </div>
                     </div>
 
                     <div className="d-flex flex-column">
-                        {questionData["format"] == "latex" && <div>
+                        {props.questionStateDict["format"] == "latex" && <div>
                             <MathJax.Context input='tex'>
                                 <div>
-                                    <MathJax.Node>{questionData["B"]}</MathJax.Node>
+                                    <MathJax.Node>{props.questionStateDict["B"]}</MathJax.Node>
                                 </div>
                             </MathJax.Context>
                         </div>}
                         <div className={styles.optionBox}>
-                            <Checkbox onChange={(e) => handleCheck(e, "correct", "B")} checked={questionData["correct"] == "B"} icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
-                            <TextareaAutosize value={questionData["B"]} onChange={(e) => onChange(e, "B")} className={styles.option} placeholder="Option B 🐶" />
+                            <Checkbox onChange={(e) => handleCheck(e, "correct", "B")} checked={props.questionStateDict["correct"] == "B"} icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
+                            <TextareaAutosize value={props.questionStateDict["B"]} onChange={(e) => onChange(e, "B")} className={styles.option} placeholder="Option B 🐶" />
                         </div>
                     </div>
                     {/* <input onChange={(e) => onChange(e, "A")} placeholder="Option A"></input> */}
@@ -149,29 +160,29 @@ function Question(props) {
                     <input onChange={(e) => onChange(e, "D")} placeholder="Option D"></input> */}
 
                     <div className="d-flex flex-column">
-                        {questionData["format"] == "latex" && <div>
+                        {props.questionStateDict["format"] == "latex" && <div>
                             <MathJax.Context input='tex'>
                                 <div>
-                                    <MathJax.Node>{questionData["C"]}</MathJax.Node>
+                                    <MathJax.Node>{props.questionStateDict["C"]}</MathJax.Node>
                                 </div>
                             </MathJax.Context>
                         </div>}
                         <div className={styles.optionBox}>
-                            <Checkbox onChange={(e) => handleCheck(e, "correct", "C")} checked={questionData["correct"] == "C"} icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
-                            <TextareaAutosize value={questionData["C"]} onChange={(e) => onChange(e, "C")} className={styles.option} placeholder="Option C 🏗️" /></div>
+                            <Checkbox onChange={(e) => handleCheck(e, "correct", "C")} checked={props.questionStateDict["correct"] == "C"} icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
+                            <TextareaAutosize value={props.questionStateDict["C"]} onChange={(e) => onChange(e, "C")} className={styles.option} placeholder="Option C 🏗️" /></div>
                     </div>
 
                     <div className="d-flex flex-column">
-                        {questionData["format"] == "latex" && <div>
+                        {props.questionStateDict["format"] == "latex" && <div>
                             <MathJax.Context input='tex'>
                                 <div>
-                                    <MathJax.Node>{questionData["D"]}</MathJax.Node>
+                                    <MathJax.Node>{props.questionStateDict["D"]}</MathJax.Node>
                                 </div>
                             </MathJax.Context>
                         </div>}
                         <div className={styles.optionBox}>
-                            <Checkbox onChange={(e) => handleCheck(e, "correct", "D")} checked={questionData["correct"] == "D"} icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
-                            <TextareaAutosize value={questionData["D"]} onChange={(e) => onChange(e, "D")} className={styles.option} placeholder="Option D 🍕" />
+                            <Checkbox onChange={(e) => handleCheck(e, "correct", "D")} checked={props.questionStateDict["correct"] == "D"} icon={<CheckCircleIcon fontSize="large" />} checkedIcon={<CheckCircleIcon fontSize="large" />} />
+                            <TextareaAutosize value={props.questionStateDict["D"]} onChange={(e) => onChange(e, "D")} className={styles.option} placeholder="Option D 🍕" />
                         </div>
                     </div>
                 </div>

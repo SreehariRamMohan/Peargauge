@@ -138,8 +138,16 @@ def create_deck():
                             upsert=False,
                             return_document=ReturnDocument.AFTER
                         )
-    # print("Created deck and the returned document is", returned_document)
-    mongo.db.sets.insert_one(deck)
+
+    # handle the case where we are editing an existing deck
+    user = mongo.db.users.find_one({"_id": ObjectId(mongo_user_id)})
+    user_decks = user["decks"]
+    if deck_id in user_decks:
+        # we're editing an existing deck
+        doc = mongo.db.sets.find_one_and_replace(filter={"_id": deck_id}, replacement=deck, return_document=ReturnDocument.AFTER)
+        print("modified the document here it is after the update", doc)
+    else:
+        mongo.db.sets.insert_one(deck)
     return jsonify({"status": "success"})
 
 @app.route("/api/startLecture", methods=['POST'])
@@ -187,12 +195,31 @@ def get_deck_name():
 
     return jsonify({"titles": user_deck_names, "uids": user_deck_uids})
 
+# TODO: merge getDeck2 into getDeck. Leaving original to prevent website breaking while testing. 
 @app.route("/api/getDeck", methods=['POST'])
 def get_deck():
     deck = mongo.db.sets.find_one({"title": request.json["title"]})
     # print("deck found on the backend is", deck)
     # ObjectId is not by default serializable to json
     return jsonify({"deck": json.dumps(deck, default=str)})
+
+@app.route("/api/getDeck2", methods=['POST'])
+def get_deck2():
+    mongo_id = request.json["mongo_id"]
+    deck_id_to_find = request.json["deck_id"]
+
+    user = mongo.db.users.find_one({"_id": ObjectId(mongo_id)})
+    user_decks = user["decks"]
+
+    # TODO: Properly handle errors using a class https://flask.palletsprojects.com/en/1.1.x/patterns/apierrors/
+
+    # verify that the requested deck id is a deck the mongo user created
+    if not deck_id_to_find in user_decks:
+        return jsonify({"status": "Failure, user does not own the deck requested"})
+    else:
+        deck = mongo.db.sets.find_one({"_id": deck_id_to_find})
+        return jsonify({"status": "success", "deck": deck})
+
 
 # verify the validity of a jwt token
 @app.route("/api/verify", methods=['POST'])
