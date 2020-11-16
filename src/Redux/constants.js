@@ -14,4 +14,4 @@ export const generate_join_url = (uid) => {
     } 
 } 
 
-export const AUTO_LOG_IN = true
+export const AUTO_LOG_IN = false

@@ -25,6 +25,10 @@ function EditLectureDeck(props) {
         getDeckTitles()
     }, [])
 
+    useEffect(() => {
+        getDeckTitles()
+    }, [props.refresh_prop])
+
     function getDeckTitles() {
 
         axios.post(URL + "/getDeckNames", {
@@ -55,7 +59,10 @@ function EditLectureDeck(props) {
             }
         }
 
-        //TODO: delete deck_id from mongodb
+        axios.post(URL + "/deleteDeck", {
+            "mongo_id": mongo_id,
+            "deck_id": deck_id
+        })
 
     }
 

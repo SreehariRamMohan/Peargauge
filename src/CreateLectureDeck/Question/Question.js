@@ -70,6 +70,7 @@ function Question(props) {
             update["B"] = "Joe Biden"
             update["C"] = "Donald Trump"
             update["D"] = "Benjamin Harrison"
+            update["correct"] = "D"
 
             // set the question render format to text, to remove the latex rendering
             update["format"] = "text"
@@ -88,6 +89,7 @@ function Question(props) {
             update["B"] = "\\lambda^{2}"
             update["C"] = "\\int_0^{\\infty} \\lambda e^{\\frac{x}{\\lambda}} dx"
             update["D"] = "\\text{not convergent ??}"
+            update["correct"] = "A"
 
             // set the question render format to latex, to add the latex rendering box
             update["format"] = "latex"

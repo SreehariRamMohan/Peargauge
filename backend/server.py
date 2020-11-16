@@ -142,12 +142,13 @@ def create_deck():
     # handle the case where we are editing an existing deck
     user = mongo.db.users.find_one({"_id": ObjectId(mongo_user_id)})
     user_decks = user["decks"]
-    if deck_id in user_decks:
-        # we're editing an existing deck
-        doc = mongo.db.sets.find_one_and_replace(filter={"_id": deck_id}, replacement=deck, return_document=ReturnDocument.AFTER)
-        print("modified the document here it is after the update", doc)
-    else:
-        mongo.db.sets.insert_one(deck)
+    doc = mongo.db.sets.find_one_and_replace(filter={"_id": deck_id}, replacement=deck, return_document=ReturnDocument.AFTER, upsert=True)
+    print("modified the document here it is after the update", doc)
+    # if deck_id in user_decks:
+    #     # we're editing an existing deck
+        
+    # else:
+    #     mongo.db.sets.insert_one(deck)
     return jsonify({"status": "success"})
 
 @app.route("/api/startLecture", methods=['POST'])
@@ -187,11 +188,11 @@ def get_deck_name():
     user_deck_names = []
     user_deck_uids = []
     
-
     for deck_uid in user_decks:
         deck = mongo.db.sets.find_one({"_id": deck_uid})
-        user_deck_names.append(deck["title"])
-        user_deck_uids.append(deck_uid)
+        if not deck == None:
+            user_deck_names.append(deck["title"])
+            user_deck_uids.append(deck_uid)
 
     return jsonify({"titles": user_deck_names, "uids": user_deck_uids})
 
@@ -219,6 +220,21 @@ def get_deck2():
     else:
         deck = mongo.db.sets.find_one({"_id": deck_id_to_find})
         return jsonify({"status": "success", "deck": deck})
+
+@app.route("/api/deleteDeck", methods=['POST'])
+def delete_deck():
+    mongo_id = request.json["mongo_id"]
+    deck_id_to_find = request.json["deck_id"]
+
+    user = mongo.db.users.find_one({"_id": ObjectId(mongo_id)})
+    user_decks = user["decks"]
+
+    # verify that the requested deck id is a deck the mongo user created
+    if not deck_id_to_find in user_decks:
+        return jsonify({"status": "Failure, user does not own the deck requested to be deleted"})
+    else:
+        deck = mongo.db.sets.find_one_and_delete({"_id": deck_id_to_find})
+        return jsonify({"status": "success", "deck_deleted": deck})
 
 
 # verify the validity of a jwt token

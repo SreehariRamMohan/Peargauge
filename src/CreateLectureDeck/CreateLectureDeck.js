@@ -101,7 +101,7 @@ function CreateLectureDeck(props) {
 
     function questionUpdate(questionNumber, update) {
         let newState = { ...questionContent }
-        newState["" + questionNumber] = { ...newState["" + questionNumber], ...update }
+        newState[questionNumber] = { ...newState["" + questionNumber], ...update }
         setQuestionContent(newState)
     }
 
@@ -129,6 +129,7 @@ function CreateLectureDeck(props) {
             .then(data => {
                 // console.log(data)
                 setSaving(false)
+                props.refresh()
             })
     }
 
@@ -153,7 +154,7 @@ function CreateLectureDeck(props) {
                 } */}
 
                 {
-                    Object.keys(questionContent).map((value, index, arr) => {
+                    Object.keys(questionContent).sort().map((value, index, arr) => {
                         return <Question questionNumber={value} questionStateDict={questionContent[value]} updateFunction={questionUpdate} />
                     })
                 }
