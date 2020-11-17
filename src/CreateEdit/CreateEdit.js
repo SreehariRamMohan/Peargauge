@@ -27,6 +27,7 @@ function CreateEdit() {
 
     function refresh_edit_deck_screen() {
         setLastSavedTime(date.getTime())
+        console.log("time of save", date.getTime())
     }
 
 

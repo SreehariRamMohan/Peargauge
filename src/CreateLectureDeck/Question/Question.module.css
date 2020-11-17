@@ -48,3 +48,25 @@
 .exampleText:hover {
   color: green;
 }
+
+.clearIconWrapper {
+  position: relative;
+  left: 51%; 
+  top: -5vh;
+  /*right: 5%; */
+  /* bottom: 80vh; */
+  z-index: 2;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.1);
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.clearIconWrapper:hover {
+  transition: 0.5s;
+  transform: rotate(360deg);
+}

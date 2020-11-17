@@ -12,7 +12,7 @@ import MathJax from 'react-mathjax2'
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
-
+import ClearIcon from '@material-ui/icons/Clear';
 
 import styles from "./Question.module.css"
 const tex = `f(x) = \\int_{-\\infty}^\\infty\\hat f(\\xi)\\,e^{2 \\pi i \\xi x}\\,d\\xi`
@@ -31,7 +31,7 @@ function Question(props) {
 
     // const [questionData, setQuestionData] = useState(initalQuestionData)
     useEffect(() => {
-        console.log("In the question react component, props.questionStateDict=", props.questionStateDict)
+
     }, [props.questionStateDict])
 
 
@@ -109,6 +109,10 @@ function Question(props) {
                         </div>
                     </MathJax.Context>
                 </div>}
+
+                <div className={styles.clearIconWrapper} onClick={() => props.deleteFunction(""+props.questionNumber)}>
+                    <ClearIcon fontSize="large" className={styles.clearIcon}/>
+                </div>
 
                 <TextareaAutosize value={props.questionStateDict["question"]} onChange={(e) => onChange(e, "question")} className={styles.question} rowsMin={2} placeholder="Question... normal text or Latex supported 🐳" />
 

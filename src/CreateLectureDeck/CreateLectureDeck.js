@@ -24,6 +24,10 @@ function CreateLectureDeck(props) {
     const mongo_id = useSelector((state) => state.mongo_id);
 
     useEffect(() => {
+        addQuestion()
+    }, [])
+    
+    useEffect(() => {
         if (props.edit_deck_uid != "" && props.edit_deck_uid != deckId) {
             console.log("Value of props.edit_deck_uid changed to ", props.edit_deck_uid)
 
@@ -105,6 +109,16 @@ function CreateLectureDeck(props) {
         setQuestionContent(newState)
     }
 
+    function deleteQuestion(questionNumber) {
+        let newState = {...questionContent} 
+        if (newState.hasOwnProperty("" + questionNumber)) {
+            delete newState["" + questionNumber]
+            setQuestionContent(newState)
+        }
+        
+
+    }
+
     function saveQuestions() {
 
         setSaving(true)
@@ -155,7 +169,8 @@ function CreateLectureDeck(props) {
 
                 {
                     Object.keys(questionContent).sort().map((value, index, arr) => {
-                        return <Question questionNumber={value} questionStateDict={questionContent[value]} updateFunction={questionUpdate} />
+                        return <Question questionNumber={value} questionStateDict={questionContent[value]} updateFunction={questionUpdate} 
+                                            deleteFunction={deleteQuestion}/>
                     })
                 }
 

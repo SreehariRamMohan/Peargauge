@@ -14,4 +14,4 @@ export const generate_join_url = (uid) => {
     } 
 } 
 
-export const AUTO_LOG_IN = false
+export const AUTO_LOG_IN = (window.location.hostname == "peargauge-dev.herokuapp.com") ? false : true

@@ -41,6 +41,8 @@ function Home() {
   useEffect(() => {
     console.log("The jwt token is", jwt_token)
     console.log("The mongo id is",  mongo_id)
+    
+    history.push("/create");
   }, []);
 
   function onClick(type) {
