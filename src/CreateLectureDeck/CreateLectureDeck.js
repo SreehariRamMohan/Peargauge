@@ -55,7 +55,7 @@ function CreateLectureDeck(props) {
                     //res.data.deck.questions
                     let questionContent = {}
                     for (var i = 0; i < data.deck.questions.length; i++) {
-                        questionContent[(i+1) + ""] = data.deck.questions[i]
+                        questionContent[(parseInt(i)+1) + ""] = data.deck.questions[i]
                     }
 
                     setQuestionContent(questionContent)
@@ -87,7 +87,7 @@ function CreateLectureDeck(props) {
     function addQuestion() {
 
         let newState = { ...questionContent }
-        newState["" + numQuestions + 1] = {
+        newState[(numQuestions + 1)+""] = {
             "question": "",
             "A": "",
             "B": "",
@@ -115,8 +115,32 @@ function CreateLectureDeck(props) {
             delete newState["" + questionNumber]
             setQuestionContent(newState)
         }
-        
+    }
 
+    // method to help instructors modify the order of the questions in their deck 
+    function swapQuestion(questionNumber, direction) {
+        let keys = Object.keys(questionContent)
+
+        let destination; 
+        if (direction == "UP") {
+            destination = (parseInt(questionNumber) - 1)+""
+        } else if (direction == "DOWN") {
+            destination = (parseInt(questionNumber) + 1)+""
+        }
+
+        if (destination < 1 || destination > keys.length) {
+            return //First question can't be moved up. Last question can't be moved down. 
+        } else {
+            let targetQuestion = Object.assign({}, questionContent[destination])
+            let questionToSwap = Object.assign({}, questionContent[questionNumber])
+
+            let newQuestionContent = {...questionContent}
+            newQuestionContent[questionNumber] = targetQuestion
+            newQuestionContent[destination] = questionToSwap
+
+            setQuestionContent(newQuestionContent)
+            return
+        }
     }
 
     function saveQuestions() {
@@ -170,7 +194,9 @@ function CreateLectureDeck(props) {
                 {
                     Object.keys(questionContent).sort().map((value, index, arr) => {
                         return <Question questionNumber={value} questionStateDict={questionContent[value]} updateFunction={questionUpdate} 
-                                            deleteFunction={deleteQuestion}/>
+                                            deleteFunction={deleteQuestion} swapQuestion={swapQuestion}
+                                            firstQuestion={index==0 ? true : false} 
+                                            lastQuestion={index==(arr.length-1) ? true : false}/>
                     })
                 }
 

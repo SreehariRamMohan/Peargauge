@@ -16,6 +16,7 @@ Libraries:
 - QR Code API : http://goqr.me/api/
 - date-fns : lightweight date formatting library
 - bcrypt : hash passwords
+- classnames : react conditional join classnames
 
 Photo/Media Credits
 - Credits to Icons8 for a few of the icons on the home page

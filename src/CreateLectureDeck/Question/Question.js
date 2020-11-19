@@ -14,22 +14,20 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import ClearIcon from '@material-ui/icons/Clear';
 
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+
+import classNames from 'classnames/bind';
+
 import styles from "./Question.module.css"
+
+let cx = classNames.bind(styles); //classnames package bound to our classes in the module.css
+//alows us to merge class names in react.
+
 const tex = `f(x) = \\int_{-\\infty}^\\infty\\hat f(\\xi)\\,e^{2 \\pi i \\xi x}\\,d\\xi`
 
 function Question(props) {
 
-    // let initalQuestionData = {
-    //     "question": "",
-    //     "A": "",
-    //     "B": "",
-    //     "C": "",
-    //     "D": "",
-    //     "correct": "",
-    //     "format": "text" //if "latex" we format with latex
-    // }
-
-    // const [questionData, setQuestionData] = useState(initalQuestionData)
     useEffect(() => {
 
     }, [props.questionStateDict])
@@ -38,7 +36,6 @@ function Question(props) {
     function handleCheck(event, type, letter) {
         let update = { ...props.questionStateDict }
         update[type + ""] = letter
-        // setQuestionData(update)
         props.updateFunction(props.questionNumber, update)
     }
 
@@ -51,11 +48,8 @@ function Question(props) {
     }
 
     function onChange(event, type) {
-        //console.log(props.questionNumber,":",type, ":", event.target)
-        // let update = { ...questionData }
         let update = { ...props.questionStateDict }
         update[type + ""] = event.target.value
-        // setQuestionData(update)
         props.updateFunction(props.questionNumber, update)
     }
 
@@ -75,12 +69,10 @@ function Question(props) {
             // set the question render format to text, to remove the latex rendering
             update["format"] = "text"
 
-            // setQuestionData(update)        
             props.updateFunction(props.questionNumber, update)
 
         } else if (questionType == "latex") {
             const latexQuestion = "\\text{find } \\mathbb{E}(x) \\text{ where X is a Poisson random variable } P\\left( x \\right) = \\frac{{e^{ - \\lambda } \\lambda ^x }}{{x!}}"
-            // let update = { ...questionData }
 
             let update = { ...props.questionStateDict }
 
@@ -94,7 +86,6 @@ function Question(props) {
             // set the question render format to latex, to add the latex rendering box
             update["format"] = "latex"
 
-            // setQuestionData(update)
             props.updateFunction(props.questionNumber, update)
         }
     }
@@ -124,6 +115,15 @@ function Question(props) {
                             <FormControlLabel value="latex" control={<Radio className={styles.radioButtonLabelAlignment} />} label={<p className={styles.radioButtonLabelAlignment}>latex, view <span onClick={() => showQuestionExample("latex")} className={styles.exampleText}>example</span></p>} />
                         </RadioGroup>
                     </FormControl>
+                </div>
+
+                <div className={styles.switchOrderingBox}>
+                    <div className={cx("arrow", "pt-2")} onClick={() => props.swapQuestion(props.questionNumber, "UP")}>
+                        {!props.firstQuestion && <ArrowUpwardIcon fontSize="large"/>}
+                    </div>
+                    <div className={cx("arrow", "pt-2")} onClick={() => props.swapQuestion(props.questionNumber, "DOWN")}>
+                        {!props.lastQuestion && <ArrowDownwardIcon fontSize="large"/>}
+                    </div>
                 </div>
 
 
@@ -158,13 +158,8 @@ function Question(props) {
                             <TextareaAutosize value={props.questionStateDict["B"]} onChange={(e) => onChange(e, "B")} className={styles.option} placeholder="Option B 🐶" />
                         </div>
                     </div>
-                    {/* <input onChange={(e) => onChange(e, "A")} placeholder="Option A"></input> */}
-                    {/* <input onChange={(e) => onChange(e, "B")} placeholder="Option B"></input> */}
                 </div>
                 <div className={styles.mContainer}>
-                    {/* <input onChange={(e) => onChange(e, "C")} placeholder="Option C"></input>
-                    <input onChange={(e) => onChange(e, "D")} placeholder="Option D"></input> */}
-
                     <div className="d-flex flex-column">
                         {props.questionStateDict["format"] == "latex" && <div>
                             <MathJax.Context input='tex'>
@@ -192,16 +187,6 @@ function Question(props) {
                         </div>
                     </div>
                 </div>
-
-                {/* <label for="correct">Correct Answer</label>
-                <select onChange={(e) => onChange(e, "correct")} name="correct" id="correctAnswer">
-                    <option value="" disabled selected>Select one</option>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                </select> */}
-
             </div>
         </React.Fragment>
     )

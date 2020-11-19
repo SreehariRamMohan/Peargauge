@@ -11,6 +11,7 @@
     "axios": "^0.20.0",
     "bcryptjs": "^2.4.3",
     "bootstrap": "^4.5.2",
+    "classnames": "^2.2.6",
     "date-fns": "^2.16.1",
     "immer": "^7.0.9",
     "react": "^16.13.1",
