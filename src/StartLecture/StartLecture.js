@@ -12,7 +12,11 @@ import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend } fro
 
 //question visualization
 import QuestionViz from "./QuestionViz/QuestionViz"
+import Accordion from 'react-bootstrap/Accordion'
+import { Card, Button } from "react-bootstrap"
+
 import { URL, WEBSOCKET_URL, generate_join_url } from "../Redux/constants"
+import CardToggle from "./CardToggle/CardToggle";
 
 const axios = require("axios")
 
@@ -60,7 +64,7 @@ function StartLecture() {
             "D": 0
         }
     }
-    
+
     const [responseData, setResponseData] = useState(data)
 
     const mongo_id = useSelector((state) => state.mongo_id)
@@ -104,11 +108,11 @@ function StartLecture() {
             //     chartDataNew[i].responses = stats[order[i]]
             // }
 
-            let update = {...responseData}
+            let update = { ...responseData }
 
             //case where we are going to a question for the first time
             update[qi] = stats
-            
+
             setResponseData(update)
 
             reformatDataForChart(update)
@@ -176,7 +180,7 @@ function StartLecture() {
     */
     function reformatDataForChart(data) {
         let formattedData = []
-        
+
         let order = ["A", "B", "C", "D"]
         for (var i = 0; i < order.length; i++) {
             const letterObject = {
@@ -243,12 +247,12 @@ function StartLecture() {
 
     function onClick(e, type) {
         if (type == "forward") {
-            setQi(Math.min(qi + 1, deckSelected.questions.length - 1))            
-            
+            setQi(Math.min(qi + 1, deckSelected.questions.length - 1))
+
             //reset the graph chart data with either new data or previous data 
             let index = Math.min(qi + 1, deckSelected.questions.length - 1)
-            if ( (index) in responseData ) {
-                setFormattedChartData(responseData[index]) 
+            if ((index) in responseData) {
+                setFormattedChartData(responseData[index])
             } else {
                 setFormattedChartData(initialChartDataForQuestion)
             }
@@ -259,20 +263,20 @@ function StartLecture() {
 
             //reset the graph chart data with either new data or previous data 
             let index = Math.max(qi - 1, 0)
-            if ( (index) in responseData ) {
-                setFormattedChartData(responseData[index]) 
+            if ((index) in responseData) {
+                setFormattedChartData(responseData[index])
             } else {
                 setFormattedChartData(initialChartDataForQuestion)
             }
         }
 
-       
+
 
 
     }
 
     function getDeckTitles() {
-        axios.post(URL + "/getDeckNames", {"mongo_id": mongo_id})
+        axios.post(URL + "/getDeckNames", { "mongo_id": mongo_id })
             .then(res => {
                 return res.data
             })
@@ -348,23 +352,35 @@ function StartLecture() {
 
                 {inputRoomId != "" && <div><p>Scan QR code to get started</p><img src={"https://api.qrserver.com/v1/create-qr-code/?data=" + generate_join_url(inputRoomId) + "&amp;size=200x200"} /> <p>(or visit this <a href={generate_join_url(inputRoomId)}>url</a>)</p></div>}
 
+                <Accordion className={styles.accordion} defaultActiveKey="0">
+                    <Card>
+                        <Card.Header>
+                            <CardToggle eventKey="0"></CardToggle>
+                        </Card.Header>
+                        <Accordion.Collapse eventKey="0">
+                            <Card.Body>
+                                <div className={styles.stats}>
+                                    <p className={styles.letter}>A: {answerData["A"]}</p>
+                                    <p className={styles.letter}>B: {answerData["B"]}</p>
+                                    <p className={styles.letter}>C: {answerData["C"]}</p>
+                                    <p className={styles.letter}>D: {answerData["D"]}</p>
+                                </div>
 
-                <p>Responses</p>
+                                <BarChart width={730} height={250} data={formattedChartData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
 
-                <div className={styles.stats}>
-                    <p className={styles.letter}>A: {answerData["A"]}</p>
-                    <p className={styles.letter}>B: {answerData["B"]}</p>
-                    <p className={styles.letter}>C: {answerData["C"]}</p>
-                    <p className={styles.letter}>D: {answerData["D"]}</p>
-                </div>
+                                    <Bar dataKey="responses" fill="#95bc3e" />
+                                </BarChart>
 
-                <BarChart width={730} height={250} data={formattedChartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                            </Card.Body>
+                        </Accordion.Collapse>
+                    </Card>
+                </Accordion>
 
-                    <Bar dataKey="responses" fill="#95bc3e" />
-                </BarChart>
+
+
             </div>
         </React.Fragment>
     )

@@ -79,7 +79,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 4rem;
+  font-size: 5vw;
   font-weight: bold;
 }
 
@@ -91,7 +91,7 @@
   font-size: 4rem;
   font-weight: bold;
   color: white;
-  font-size: 1rem;
+  font-size: 1.5vw;
   font-weight: 600;
 }
 
@@ -106,4 +106,12 @@
 
 .session_popup {
   padding: 1rem;
+}
+
+.quote {
+    padding: 0.5rem;
+    font-size: 1vw;
+    color: hsla(0,0%,0%,0.80);
+    border-left: 0.5rem solid;
+    border-color: #604dae; 
 }

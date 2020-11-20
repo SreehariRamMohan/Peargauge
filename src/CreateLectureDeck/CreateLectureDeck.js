@@ -24,7 +24,6 @@ function CreateLectureDeck(props) {
     const mongo_id = useSelector((state) => state.mongo_id);
 
     useEffect(() => {
-        addQuestion()
     }, [])
     
     useEffect(() => {

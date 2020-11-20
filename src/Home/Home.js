@@ -38,12 +38,22 @@ function Home() {
   const jwt_token = useSelector((state) => state.jwt_token);
   const mongo_id = useSelector((state) => state.mongo_id)
 
+  const [time, setTime] = useState(format(new Date(), 'h:mm a'))
+  const [date, setDate] = useState(format(new Date(), 'PPPP'))
+
   useEffect(() => {
     console.log("The jwt token is", jwt_token)
     console.log("The mongo id is",  mongo_id)
     
-    history.push("/create");
+    window.setInterval(function () {
+      updateTime();
+    }, 1000);
   }, []);
+
+  function updateTime() {
+    setTime(format(new Date(), 'h:mm a'))
+    setDate(format(new Date(), 'PPPP'))
+  }
 
   function onClick(type) {
     if (type == "new_session") {
@@ -125,11 +135,16 @@ function Home() {
             <div className={styles.card}>
               <div className={styles.imageContainer}>
                 <img className={styles.backgroundImage} src={require("../res/home-background.png")}></img>
-                <p className={styles.centeredText}>{format(new Date(), 'h:mm a')}</p>
-                <p className={styles.dateText}>{format(new Date(), 'PPPP')}</p>
+                <p className={styles.centeredText}>{time}</p>
+                <p className={styles.dateText}>{date}</p>
               </div>
               <div className={styles.meetingInformation}>
-                <p>No upcoming meetings today.</p>
+
+                <blockquote className={styles.quote}>
+                  <p>"Education must shift from instruction, from imposing of stencils, to discovery—to probing and exploration and to the recognition of the language of forms."</p>
+                  <p>--Marshall McLuhan</p>
+                </blockquote>
+                
               </div>
             </div>
           </div>
