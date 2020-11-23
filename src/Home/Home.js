@@ -63,7 +63,7 @@ function Home() {
     } else if (type == "join") {
       history.push("/sample");
     } else if (type == "settings") {
-      history.push("/home");
+      history.push("/settings");
     }
   }
 
@@ -120,7 +120,7 @@ function Home() {
                 </div>
               </OverlayTrigger>
 
-              <div onClick={() => onClick("new_session")}>
+              <div onClick={() => onClick("settings")}>
                 <div className={styles.logoWrapper}>
                   <img src={require("../res/settings-white-small.png")}></img>
                 </div>

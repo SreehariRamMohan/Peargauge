@@ -148,6 +148,7 @@ function StartLecture() {
         if (Object.keys(deckSelected).length > 0) {
             updateQuestion()
             startLecture()
+
         }
     }, [deckSelected])
 
@@ -318,7 +319,6 @@ function StartLecture() {
         )
     }
 
-
     return (
         <React.Fragment>
             <CustomNavbar />
@@ -345,12 +345,11 @@ function StartLecture() {
                 {Object.keys(deckSelected).length > 0 ? questionVizView(false) : questionVizView(true)}
 
 
-                {/* while the socket connection is being established prevent the user from submitting */}
-                {/* <button disabled={teacherSocketId == ""} className={styles.button} onClick={startLecture}>Start lecture button</button> */}
 
-                {/* <input disabled={true} placeholder="room id" value={inputRoomId} onChange={(e) => onChange(e, "room")}></input> */}
-
-                {inputRoomId != "" && <div><p>Scan QR code to get started</p><img src={"https://api.qrserver.com/v1/create-qr-code/?data=" + generate_join_url(inputRoomId) + "&amp;size=200x200"} /> <p>(or visit this <a href={generate_join_url(inputRoomId)}>url</a>)</p></div>}
+                {inputRoomId != "" && <div>
+                    <p>Scan QR code to get started</p><img src={"https://api.qrserver.com/v1/create-qr-code/?data=" + generate_join_url(inputRoomId) + "&amp;size=200x200"} />
+                    <p>(or visit this <a href={generate_join_url(inputRoomId)}>url</a>)</p>
+                </div>}
 
                 <Accordion className={styles.accordion} defaultActiveKey="0">
                     <Card>

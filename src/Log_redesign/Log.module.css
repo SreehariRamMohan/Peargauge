@@ -1,0 +1,49 @@
+.background {
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.form {
+    width: 50%;
+}
+
+.form_input {
+    width: 50%;
+    margin-top: 3vh;
+    margin-bottom: 3vh;
+}
+
+.biggerFont {
+    font-size: 6vw;
+    color: #5A5959;
+}
+
+.smallerFont {
+    font-size: 4vw;
+    color: #7E7A7A;
+    text-decoration: underline;
+}
+
+.svgContainer {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.peargaugeLogo {
+    width: 32vw;
+    transform: rotate(20deg);
+    z-index: 10;
+}
+
+
+.blob1 {
+    width: 20vw;
+    position: relative;
+    top: -50%;
+    left: -12%;
+    z-index: 0;
+}
