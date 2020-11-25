@@ -12,11 +12,14 @@ import styles from './Log.module.css';
 import svg from "../res/peargauge-background_03.svg"
 import { URL, AUTO_LOG_IN } from "../Redux/constants"
 
-import { ReactComponent as PeargaugeLogo } from '../res/Peargauge-Logo_2.svg';
-import { ReactComponent as Blob } from '../res/blob.svg';
+// import { ReactComponent as PeargaugeLogo } from '../res/Peargauge-Logo_2.svg';
+// import { ReactComponent as Blob } from '../res/blob.svg';
 
-import { gsap } from "gsap";
-import {moveCircle} from "./animate"
+import PeargaugeLogo from "../Peargauge/Peargauge"
+import { Frame, useAnimation } from "framer"
+
+// import { gsap } from "gsap";
+// import {moveCircle} from "./animate"
 
 const axios = require("axios")
 const classNames = require("classnames")
@@ -31,10 +34,14 @@ function Log() {
     const history = useHistory();
     const dispatch = useDispatch();
 
+    const [x, setX] = useState(0)
+    const [y, setY] = useState(0)
+
     const jwt_token = useSelector((state) => state.jwt_token);
 
 
     let intro = useRef(null)
+
 
     useEffect(() => {
         console.log(`URL is ${URL}`)
@@ -42,7 +49,7 @@ function Log() {
         // if (AUTO_LOG_IN) {
         //     onSubmit()
         // }
-        moveCircle(intro)
+        // moveCircle(intro)
 
     }, []);
 
@@ -86,26 +93,28 @@ function Log() {
 
     }
 
+    function handleMouseMove(event) {
+        // console.log(event.clientX, ",", event.clientY)
+        setX(event.clientX)
+        setY(event.clientY)
+    }
+
     return (
-        <React.Fragment>
+        <div>
             <CustomNavbar hideLogout={true} />
-            <div className={styles.background}>
+            <div className={styles.background} onMouseMove={handleMouseMove}>
                 <div className={styles.form}>
-                    <p className={styles.biggerFont}>Login <span className={styles.smallerFont}>or create account</span></p>
+                    <p className={styles.biggerFont}>{loginState ? "Login" : "Create Account"}<span className={styles.smallerFont} onClick={() => { toggleLoginState(!loginState) }}> or {!loginState ? "login" : "create account"}</span></p>
                     <Form.Control className={styles.form_input} ref={usernameRef} type="text" placeholder="username" />
                     <Form.Control className={styles.form_input} ref={passwordRef} type="password" placeholder="password" />
-                    <Button onClick={() => onSubmit()} variant="light">Log in</Button>
+                    <Button onClick={() => onSubmit()} variant="light">{loginState ? "Login" : "Create Account"}</Button>
                 </div>
-                <div>
+                <div className={styles.spacer}></div>
+                <PeargaugeLogo className={styles.peargaugeLogo} clientX={x} clientY={y} />
 
-                    <div className={styles.svgContainer}>
-                        <PeargaugeLogo ref={(l) => (intro = l)} className={styles.peargaugeLogo} />
-                    </div>
-
-                </div>
             </div>
 
-        </React.Fragment >
+        </div>
     )
 }
 
