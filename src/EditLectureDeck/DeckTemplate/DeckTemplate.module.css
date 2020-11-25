@@ -1,5 +1,5 @@
 .stylistic_rounded_button {
-    border-radius: 2rem;
+    border-radius: 1.5rem;
     padding: 0.5rem;
     display: flex;
     justify-content: center;
@@ -7,4 +7,7 @@
     background: whitesmoke;
     border: 0;
     
+}
+.deckCard {
+    padding: 1rem;
 }

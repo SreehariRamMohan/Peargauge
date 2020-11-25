@@ -13,7 +13,7 @@ function Peargauge(props) {
     blobAnimate.stop()
     let offsetX = props.clientX - window.innerWidth / 2
     let offsetY = props.clientY - window.innerHeight / 2
-    blobAnimate.start({ x: offsetX / 10, y: offsetY / 10 })
+    blobAnimate.start({ x: offsetX / 14, y: offsetY / 14 })
   }, [props.clientX, props.clientY])
 
 

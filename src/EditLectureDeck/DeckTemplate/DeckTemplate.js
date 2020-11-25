@@ -7,6 +7,10 @@ import styles from "./DeckTemplate.module.css"
 import { useHistory } from "react-router-dom";
 import { OverlayTrigger, Popover } from "react-bootstrap"
 
+import classNames from 'classnames/bind';
+
+let cx = classNames.bind(styles);
+
 function DeckTemplate(props) {
 
     const history = useHistory();
@@ -17,7 +21,7 @@ function DeckTemplate(props) {
 
     return (
         <React.Fragment>
-            <div className="card">
+            <div className={cx("card", "deckCard")}>
                 <p>{props.title}</p>
                 <div className="d-flex flex-row justify-content-around">
                     <button onClick={edit} className={styles.stylistic_rounded_button}><EditIcon fontSize="large" /> Edit</button>

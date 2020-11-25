@@ -39,17 +39,12 @@ function Log() {
 
     const jwt_token = useSelector((state) => state.jwt_token);
 
-
-    let intro = useRef(null)
-
-
     useEffect(() => {
         console.log(`URL is ${URL}`)
 
-        // if (AUTO_LOG_IN) {
-        //     onSubmit()
-        // }
-        // moveCircle(intro)
+        if (AUTO_LOG_IN) {
+            onSubmit()
+        }
 
     }, []);
 
@@ -65,10 +60,10 @@ function Log() {
             "password": passwordRef.current.value
         }
 
-        // if (AUTO_LOG_IN) {
-        //     payload["username"] = "sree"
-        //     payload["password"] = "sree"
-        // }
+        if (AUTO_LOG_IN) {
+            payload["username"] = "sree"
+            payload["password"] = "sree"
+        }
 
         let route = URL + "/loginUser"
         if (!loginState) {
