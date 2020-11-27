@@ -22,7 +22,7 @@ import Navbar from "../CustomNavbar/CustomNavbar.js"
 //allow us to navigate with react-router
 import { useHistory } from "react-router-dom";
 
-import {URL} from "../Redux/constants"
+import { URL } from "../Redux/constants"
 
 //axios
 const axios = require("axios")
@@ -41,13 +41,24 @@ function Home() {
   const [time, setTime] = useState(format(new Date(), 'h:mm a'))
   const [date, setDate] = useState(format(new Date(), 'PPPP'))
 
+
+  //Axios request interceptor
+  axios.interceptors.request.use(function (config) {
+    console.log("prepending bearer token to outgoing request.")
+    config.headers.Authorization = `Bearer ${jwt_token}`
+    return config;
+  });
+
   useEffect(() => {
     console.log("The jwt token is", jwt_token)
-    console.log("The mongo id is",  mongo_id)
-    
+    console.log("The mongo id is", mongo_id)
+
     window.setInterval(function () {
       updateTime();
     }, 1000);
+
+    // history.push("/settings");
+
   }, []);
 
   function updateTime() {
@@ -105,7 +116,7 @@ function Home() {
                     <Popover.Title as="h3">Session Code</Popover.Title>
                     <Popover.Content>
                       <div className={styles.session_popup}>
-                        <input placeholder={"27"} value={sessionCode} onInput={(e) => {setSessionCode(e.target.value)}}></input>
+                        <input placeholder={"27"} value={sessionCode} onInput={(e) => { setSessionCode(e.target.value) }}></input>
                         <button onClick={onSubmitCode}>submit</button>
                       </div>
                     </Popover.Content>
@@ -144,7 +155,7 @@ function Home() {
                   <p>"Education must shift from instruction, from imposing of stencils, to discovery—to probing and exploration and to the recognition of the language of forms."</p>
                   <p>--Marshall McLuhan</p>
                 </blockquote>
-                
+
               </div>
             </div>
           </div>

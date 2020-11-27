@@ -6,7 +6,7 @@ import { Card, Nav, Button, Form, Row, Col } from "react-bootstrap"
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { set_jwt_token, set_mongo_id } from "../Redux/actions"
+import { set_jwt_token, set_mongo_id, set_username } from "../Redux/actions"
 
 import styles from './Log.module.css';
 import svg from "../res/peargauge-background_03.svg"
@@ -79,6 +79,7 @@ function Log() {
                     // store the access token in redux and the refresh token in local storage
                     dispatch(set_jwt_token(access_token))
                     dispatch(set_mongo_id(res.data["mongo_id"]))
+                    dispatch(set_username(payload["username"]))
 
                     localStorage.setItem("refresh_token", refresh_token);
 

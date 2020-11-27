@@ -102,9 +102,6 @@ def on_guess(guess):
     # print("request object is", request)
     # print(f"** client {request.sid} guessed {guess}")
 
-
-
-
 @socketio.on("connect")
 def handle_new_connection():
     print(f"a user has connected to the socket with sid {request.sid}")
@@ -120,6 +117,7 @@ def serve(path):
         return send_from_directory(app.static_folder, 'index.html')
 
 @app.route("/api/createDeck", methods=["POST"])
+@jwt_required
 def create_deck():
     title = request.json["title"]
 
@@ -152,6 +150,7 @@ def create_deck():
     return jsonify({"status": "success"})
 
 @app.route("/api/startLecture", methods=['POST'])
+@jwt_required
 def start_lecture():
     roomid = request.json["roomid"]
     teacherSocketId = request.json["teacherSocketId"]
@@ -163,6 +162,7 @@ def start_lecture():
     return jsonify({"status": "success"})
 
 @app.route("/api/updateQuestion", methods=["POST"])
+@jwt_required
 def update_question():
     roomid = request.json["roomid"]
     question = request.json["question"]
@@ -180,6 +180,7 @@ def update_question():
     return jsonify({"status": "success"})
 
 @app.route("/api/getDeckNames", methods=['POST'])
+@jwt_required
 def get_deck_name():
     mongo_id = request.json["mongo_id"]
     user = mongo.db.users.find_one({"_id": ObjectId(mongo_id)})
@@ -198,6 +199,7 @@ def get_deck_name():
 
 # TODO: merge getDeck2 into getDeck. Leaving original to prevent website breaking while testing. 
 @app.route("/api/getDeck", methods=['POST'])
+@jwt_required
 def get_deck():
     deck = mongo.db.sets.find_one({"title": request.json["title"]})
     # print("deck found on the backend is", deck)
@@ -205,6 +207,7 @@ def get_deck():
     return jsonify({"deck": json.dumps(deck, default=str)})
 
 @app.route("/api/getDeck2", methods=['POST'])
+@jwt_required
 def get_deck2():
     mongo_id = request.json["mongo_id"]
     deck_id_to_find = request.json["deck_id"]
@@ -222,6 +225,7 @@ def get_deck2():
         return jsonify({"status": "success", "deck": deck})
 
 @app.route("/api/deleteDeck", methods=['POST'])
+@jwt_required
 def delete_deck():
     mongo_id = request.json["mongo_id"]
     deck_id_to_find = request.json["deck_id"]
@@ -262,7 +266,7 @@ def create_user():
     try:
         mongo_id = mongo.db.users.insert_one(user).inserted_id
         ret = {
-            'access_token': create_access_token(identity=username),
+            'access_token': create_access_token(identity=username, expires_delta=False),
             'refresh_token': create_refresh_token(identity=username),
             'mongo_id': mongo_id
         }
@@ -281,13 +285,62 @@ def login_user():
 
     if bcrypt.check_password_hash(password_hash, password):
         ret = {
-            'access_token': create_access_token(identity=username),
+            'access_token': create_access_token(identity=username, expires_delta=False),
             'refresh_token': create_refresh_token(identity=username),
             'mongo_id': mongo_id
         }
         return json.dumps(ret, default=str), 200
     else:
         return {'status': "incorrect username or password"}, 404
+
+@app.route("/api/downloadDecks", methods=["POST"])
+@jwt_required
+def downloadDecks():
+    print("in download deck route")
+    mongo_id = request.json["mongo_id"]
+
+    mongo_user = mongo.db.users.find_one({"_id": ObjectId(mongo_id)})
+    ret = []
+    print(mongo_user)
+    if "decks" in mongo_user:
+        for deck_id in mongo_user["decks"]:
+            deck = mongo.db.sets.find_one({"_id": deck_id})
+            if not deck == None:
+                del deck["_id"]
+                ret.append(deck)
+    return {"status": "success", "decks": ret}
+
+@app.route("/api/settings/changePassword", methods=["POST"])
+@jwt_required
+def changePassword():
+    mongo_id = request.json["mongo_id"]
+    password = request.json["password"]
+    new_password = request.json["new_password"]
+
+    mongo_user = mongo.db.users.find_one({"_id": ObjectId(mongo_id)})
+
+    if bcrypt.check_password_hash(mongo_user["password"], password):
+        new_pw_hash = bcrypt.generate_password_hash(new_password)
+        mongo.db.users.update_one(filter={"_id": ObjectId(mongo_id)}, update={'$set': {'password': new_pw_hash}})
+        return {'status': "success"}, 200
+    else:
+        return {'status': "incorrect password supplied"}, 404
+
+@app.route("/api/settings/deleteAccount", methods=["POST"])
+@jwt_required
+def deleteAccount():
+    mongo_id = request.json["mongo_id"]
+
+    mongo_user = mongo.db.users.find_one({"_id": ObjectId(mongo_id)})
+
+    # delete all user decks
+    if "decks" in mongo_user:
+        for deck in mongo_user["decks"]:
+            mongo.db.sets.delete_one(filter={"_id": deck})
+    
+    mongo.db.users.delete_one(filter={"_id": ObjectId(mongo_id)})
+
+    return jsonify({"status": "success"}), 200
 
 # Route to create a new access token (not fresh) given a refresh token. 
 @app.route('/api/refresh', methods=['POST'])
