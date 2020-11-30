@@ -57,8 +57,6 @@ function Home() {
       updateTime();
     }, 1000);
 
-    // history.push("/settings");
-
   }, []);
 
   function updateTime() {

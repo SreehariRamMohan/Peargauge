@@ -70,6 +70,11 @@ function Log() {
             route = URL + "/createUser"
         }
 
+        if (payload["username"].length < 4 || payload["password"].length < 4) {
+            alert("Username and Password must be greater than 4 characters")
+            return
+        }
+
         axios.post(route, payload)
             .then(res => {
                 if (res.status == 200) {

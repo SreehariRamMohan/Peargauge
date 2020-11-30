@@ -74,6 +74,7 @@ function CreateLectureDeck(props) {
      *      "C": ""
      *      "D": ""
      *      correct: ""
+     *      format: ""
      *      }
      *      ....
      * 
@@ -142,7 +143,40 @@ function CreateLectureDeck(props) {
         }
     }
 
+    //verify the user has filled out all required fields before saving.
+    function validate() {
+        let message = ""
+        if (title == "") {
+            message += "Please ensure your deck has a title\n"
+        }
+        let keys = Object.keys(questionContent)
+        for (var i = 0; i < keys.length; i++) {
+            let questionBody = questionContent[keys[i]]
+            const {question, A, B, C, D, correct, format} = questionBody
+            if (question == "") {
+                message += "For question " + keys[i] + ", please ensure the question prompt is filled out\n"
+            }
+            if (A == "" || B == "" || C == "" || D == "") {
+                message += "For question " + keys[i] + ", please ensure the all answer choices are filled out\n"
+            }
+            if (correct == "") {
+                message += "For question " + keys[i] + ", please select a correct answer\n"
+            }
+            if (format == "") {
+                message += "For question " + keys[i] + ", please choose a display format (text or latex)\n"
+            }
+        }
+        return message
+    }
+
     function saveQuestions() {
+
+        let validationMessage = validate()
+
+        if (!(validationMessage == "")) {
+            alert(validationMessage)
+            return
+        }
 
         setSaving(true)
         

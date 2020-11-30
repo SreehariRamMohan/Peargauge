@@ -357,7 +357,7 @@ function StartLecture() {
                             <CardToggle eventKey="0"></CardToggle>
                         </Card.Header>
                         <Accordion.Collapse eventKey="0">
-                            <Card.Body>
+                            <Card.Body className={styles.cardBody}>
                                 <div className={styles.stats}>
                                     <p className={styles.letter}>A: {answerData["A"]}</p>
                                     <p className={styles.letter}>B: {answerData["B"]}</p>
@@ -365,7 +365,7 @@ function StartLecture() {
                                     <p className={styles.letter}>D: {answerData["D"]}</p>
                                 </div>
 
-                                <BarChart width={730} height={250} data={formattedChartData}>
+                                <BarChart className={styles.barChart} width={500} height={250} data={formattedChartData}>
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="name" />
                                     <YAxis />

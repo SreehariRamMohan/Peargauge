@@ -6,12 +6,15 @@ import Navbar from "../CustomNavbar/CustomNavbar"
 import Badge from 'react-bootstrap/Badge'
 
 import styles from "./SamplePage.module.css"
+import classNames from 'classnames/bind';
 
 import io from 'socket.io-client'
 
 //question visualization
 import QuestionViz from "../StartLecture/QuestionViz/QuestionViz"
 import { WEBSOCKET_URL } from "../Redux/constants";
+
+let cx = classNames.bind(styles);
 
 function mapStateToProps(state) {
     return {
@@ -26,6 +29,8 @@ function SamplePage() {
     const [disabled, setDisabled] = useState(false)
 
     const [currentQuestion, setCurrentQuestion] = useState({})
+
+    const [chosenLetter, setChosenLetter] = useState("")
 
     const socket = io(WEBSOCKET_URL);
 
@@ -55,6 +60,7 @@ function SamplePage() {
 
     useEffect(() => {
         setDisabled(false)
+        setChosenLetter("")
     }, [currentQuestion])
 
     function handleMC(letter) {
@@ -64,6 +70,7 @@ function SamplePage() {
         }
         socket.emit("guess", guessObject)
         setDisabled(true) // prevent multiple guesses
+        setChosenLetter(letter)
     }
 
     return (
@@ -80,12 +87,12 @@ function SamplePage() {
                 <QuestionViz client={true} qi={0} title={"Sample Question"} questions={[currentQuestion]} />
 
                 <div className={styles.mContainer}>
-                    <button disabled={disabled} onClick={() => handleMC("A")} className={styles.button}>A</button>
-                    <button disabled={disabled} onClick={() => handleMC("B")} className={styles.button}>B</button>
+                    <button disabled={disabled} onClick={() => handleMC("A")} className={cx(styles.button, {"chosenAnswer": chosenLetter=="A"})}>A</button>
+                    <button disabled={disabled} onClick={() => handleMC("B")} className={cx(styles.button, {"chosenAnswer": chosenLetter=="B"})}>B</button>
                 </div>
                 <div className={styles.mContainer}>
-                    <button disabled={disabled} onClick={() => handleMC("C")} className={styles.button}>C</button>
-                    <button disabled={disabled} onClick={() => handleMC("D")} className={styles.button}>D</button>
+                    <button disabled={disabled} onClick={() => handleMC("C")} className={cx(styles.button, {"chosenAnswer": chosenLetter=="C"})}>C</button>
+                    <button disabled={disabled} onClick={() => handleMC("D")} className={cx(styles.button, {"chosenAnswer": chosenLetter=="D"})}>D</button>
                 </div>
             </div>
 
