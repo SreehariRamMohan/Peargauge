@@ -47,8 +47,9 @@ function StartLecture() {
     const [answerData, setAnswerData] = useState({ "A": 0, "B": 0, "C": 0, "D": 0 })
 
     const [deckTitles, setDeckTitles] = useState([])
-
+    const [deckUIDs, setDeckUIDs] = useState([])
     const [deckTitleSelected, setDeckTitleSelected] = useState("")
+    const [deckUIDSelected, setDeckUIDSelected] = useState("")
 
     //deck specific fields
     const [deckSelected, setDeckSelected] = useState({})
@@ -284,6 +285,7 @@ function StartLecture() {
             .then(data => {
                 console.log("received deck names", data)
                 setDeckTitles(data.titles)
+                setDeckUIDs(data.uids)
             })
     }
 
@@ -291,14 +293,20 @@ function StartLecture() {
         if (type == "room") {
             setInputRoomId(event.target.value)
         } else if (type == "deck") {
+            console.log("deck index chosen", event.target.options.selectedIndex)
             setDeckTitleSelected(event.target.value)
+            setDeckUIDSelected(deckUIDs[event.target.options.selectedIndex - 1])
+            setQi(0) //reset the current question index we're on. 
+            setAnswerData({ "A": 0, "B": 0, "C": 0, "D": 0 }) // reset the answer data
+            setFormattedChartData(initialChartDataForQuestion)
         }
     }
 
     function loadDeck() {
         // fetch the deckSelected from MongoDB
         let payload = {
-            "title": deckTitleSelected
+            "mongo_id": mongo_id,
+            "deck_id": deckUIDSelected
         }
 
         axios.post(URL + "/getDeck", payload)
@@ -306,8 +314,9 @@ function StartLecture() {
                 return res.data
             })
             .then(data => {
-                setDeckSelected(JSON.parse(data["deck"]))
-                console.log("Load deck finished, the deck we loaded was:", JSON.parse(data["deck"]))
+                console.log("response from getDeck", data)
+                setDeckSelected(data["deck"])
+                console.log("Load deck finished, the deck we loaded was:", data["deck"])
             })
     }
 

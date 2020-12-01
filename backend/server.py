@@ -19,11 +19,11 @@ origin = "http://localhost:3000"
 if "PROD" in os.environ:
     origin = "https://peargauge-dev.herokuapp.com"
 
-print("Origin is", origin)
+print("Origin:", origin)
 
 CORS(app, resources={r"*": {"origins": origin, "supports_credentials": True}})
 
-# jwt 
+# JWT Manager
 app.config['SECRET_KEY'] = 'super-secret'
 jwt = JWTManager(app)
 
@@ -39,17 +39,11 @@ else:
     # local development
     r = redis.Redis(host='localhost', port=6379, db=0)
     r.flushdb()
-    # connect to the MongoDB server running on port 27017 (localhost)
-    # the database we're connecting to is called myDatabase (exposed as db)
-    # "db" is a reference to the database which can be referenced in routes/views
-    # example: mongo.db.users.find()
     app.config["MONGO_URI"] = "mongodb://localhost:27017/test"
     mongo = PyMongo(app)
 
+# Usernames need to be unique in mongo
 mongo.db.users.create_index([('username', pymongo.DESCENDING)], unique=True)
-
-# to verify mongodb is working locally, try querying documents from a sample collection within a database
-# print("return all documents in the sample collection",mongo.db.sample.find_one())
 
 #Optional Socket.IO compatibility added as a template
 app.config['SECRET_KEY'] = 'secret!'
@@ -59,13 +53,9 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # client will send the room uid in the key "roomid"
 @socketio.on("join")
 def on_join(roomid):
-    # print(f"Adding client to room {roomid} on server side")
-    #print(request.sid)
     join_room(roomid)
-    # print(r.exists(f"{roomid}:current_question"))
     if (r.exists(f"{roomid}:current_question")):
         emit("initQuestion", json.loads(r.get(f"{roomid}:current_question")))
-        # print("sending initial question to client who just joined")
 
 """
 guess object:
@@ -94,7 +84,7 @@ def on_guess(guess):
         guesses[letter] += 1
         r.set(roomid, json.dumps(guesses))
     
-    # update the teacher with the latest student guesses by sending her the latest dict via her socket
+    # update the teacher with the latest student guesses by sending them the latest dict via the socket
     teacher_room_id = r.get(f"{roomid}:teacher").decode("utf-8")
     # print(f"trying to updateGuess to teacher's room {teacher_room_id}")
     emit("updateGuess", json.loads(r.get(roomid)), room=r.get(f"{roomid}:teacher").decode("utf-8"))
@@ -105,7 +95,6 @@ def on_guess(guess):
 @socketio.on("connect")
 def handle_new_connection():
     print(f"a user has connected to the socket with sid {request.sid}")
-
 
 # serve the static react build files from flask. 
 @app.route('/', defaults={'path': ''})
@@ -142,11 +131,6 @@ def create_deck():
     user_decks = user["decks"]
     doc = mongo.db.sets.find_one_and_replace(filter={"_id": deck_id}, replacement=deck, return_document=ReturnDocument.AFTER, upsert=True)
     print("modified the document here it is after the update", doc)
-    # if deck_id in user_decks:
-    #     # we're editing an existing deck
-        
-    # else:
-    #     mongo.db.sets.insert_one(deck)
     return jsonify({"status": "success"})
 
 @app.route("/api/startLecture", methods=['POST'])
@@ -197,18 +181,9 @@ def get_deck_name():
 
     return jsonify({"titles": user_deck_names, "uids": user_deck_uids})
 
-# TODO: merge getDeck2 into getDeck. Leaving original to prevent website breaking while testing. 
 @app.route("/api/getDeck", methods=['POST'])
 @jwt_required
 def get_deck():
-    deck = mongo.db.sets.find_one({"title": request.json["title"]})
-    # print("deck found on the backend is", deck)
-    # ObjectId is not by default serializable to json
-    return jsonify({"deck": json.dumps(deck, default=str)})
-
-@app.route("/api/getDeck2", methods=['POST'])
-@jwt_required
-def get_deck2():
     mongo_id = request.json["mongo_id"]
     deck_id_to_find = request.json["deck_id"]
 
@@ -293,7 +268,7 @@ def login_user():
     else:
         return {'status': "incorrect username or password"}, 404
 
-@app.route("/api/downloadDecks", methods=["POST"])
+@app.route("/api/settings/downloadDecks", methods=["POST"])
 @jwt_required
 def downloadDecks():
     print("in download deck route")
@@ -353,7 +328,6 @@ def refresh():
     }
     return jsonify(ret), 200
 
-    
 @app.route('/api/time', methods=['GET'])
 def get_current_time():
     return {'time': time.time()}
@@ -365,7 +339,6 @@ def get_user(id):
     user = mongo.db.sample.find_one({"_id": ObjectId(id)})
     # print(user)
     return json.dumps(user, default=str)
-
 
 # Protect a view with jwt_required, which requires a valid access token
 # in the request to access.

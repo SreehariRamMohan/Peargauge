@@ -46,7 +46,7 @@ function Settings() {
 
     function downloadDecks() {
         setLoadingDownload(true)
-        axios.post(URL + "/downloadDecks", {
+        axios.post(URL + "/settings/downloadDecks", {
             "mongo_id": mongo_id,
         })
             .then(res => {

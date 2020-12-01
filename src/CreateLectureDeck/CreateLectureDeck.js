@@ -40,7 +40,7 @@ function CreateLectureDeck(props) {
             "mongo_id": mongo_id,
             "deck_id": deck_id
         }
-        axios.post(URL + "/getDeck2", payload)
+        axios.post(URL + "/getDeck", payload)
             .then(res => { return res.data })
             .then(data => {
                 if (data.status == "success") {
