@@ -130,7 +130,6 @@ def create_deck():
     user = mongo.db.users.find_one({"_id": ObjectId(mongo_user_id)})
     user_decks = user["decks"]
     doc = mongo.db.sets.find_one_and_replace(filter={"_id": deck_id}, replacement=deck, return_document=ReturnDocument.AFTER, upsert=True)
-    print("modified the document here it is after the update", doc)
     return jsonify({"status": "success"})
 
 @app.route("/api/startLecture", methods=['POST'])
@@ -213,6 +212,7 @@ def delete_deck():
         return jsonify({"status": "Failure, user does not own the deck requested to be deleted"})
     else:
         deck = mongo.db.sets.find_one_and_delete({"_id": deck_id_to_find})
+        removed_ref = mongo.db.users.update({"_id": ObjectId(mongo_id)}, {"$pull": {"decks": deck_id_to_find}})
         return jsonify({"status": "success", "deck_deleted": deck})
 
 
@@ -271,12 +271,11 @@ def login_user():
 @app.route("/api/settings/downloadDecks", methods=["POST"])
 @jwt_required
 def downloadDecks():
-    print("in download deck route")
     mongo_id = request.json["mongo_id"]
 
     mongo_user = mongo.db.users.find_one({"_id": ObjectId(mongo_id)})
     ret = []
-    print(mongo_user)
+    # print(mongo_user)
     if "decks" in mongo_user:
         for deck_id in mongo_user["decks"]:
             deck = mongo.db.sets.find_one({"_id": deck_id})

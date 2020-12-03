@@ -60,7 +60,6 @@ function Settings() {
     }
 
     function changePassword() {
-        console.log("Old Password", oldPassword, "New password", newPassword)
         let payload = {
             "mongo_id": mongo_id,
             "password": oldPassword,

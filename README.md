@@ -40,7 +40,7 @@ A few notable features
 ![Alt text](src/res/readme/login.png?raw=true "Login")
 
 ### Building from source
-If you would like to build Peargauge locally, you will need to set up Redis, and MongoDB locally. 
+If you would like to build Peargauge locally, you will need to set up Redis, and MongoDB. These can be done with the ```redis-server``` and ```mongo``` commands respectively. On localhost, I'm using a database called ```test``` and serving mongodb from port ```27017``` (```mongodb://localhost:27017/test```). Redis is being served from port ```6379``` on localhost. These values can easily be modified in server.py (lines 33-43) 
 
 1. Clone this repository. 
 2. Run ```npm install``` in the root directory
@@ -52,21 +52,21 @@ If you would like to build Peargauge locally, you will need to set up Redis, and
 export FLASK_APP=server.py
 export FLASK_ENV=development
 export APPLICATION_MODE=local
-export MONGO_URI=<MongoDB URI>
+export MONGO_URI=<MongoDB URI> // not needed if only testing locally
 ```
 
 5. Run the flask server with ```python server.py```
 6. Run the front end with ```npm start```
 
-Photos, Illustrations, and Animations
+### Photos, Illustrations, and Animations
 - Logo / Animation on the login page was created by me with Adobe Illustrator. 
 - Credits to Icons8 for the icons on the home page
 - Flower photo on homepage by Katie Drazdauskaite from Unsplash
 
-Libraries Used:
+### Libraries Used:
 - Socket.io : realtime student choice recording
 - Flask (+ Flask-Cors, Flask-JWT): backend & securing of routes with jwt tokens
-- Redis : to manage ephemeral server state & caching (socket rooms, session ids, quiz answers, etc)
+- Redis : to manage ephemeral server state & caching (socket rooms, session ids, answers, etc)
 - React/Redux/Immer : front end + state management
 - Mongo DB  : database
 - Recharts : React driven charting library
@@ -76,3 +76,7 @@ Libraries Used:
 - react math jax : LaTeX rendering
 - classnames : react conditional join classnames
 - Framer / SVGR : used for animations
+
+### Avenues of Potential Improvement
+* Support multiple answer formats (number entry, text, audio, video)
+* Allow instructors to upload media (pictures/videos) along with a question

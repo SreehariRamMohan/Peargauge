@@ -20,13 +20,22 @@ function EditLectureDeck(props) {
     const [deckTitles, setDeckTitles] = useState([])
     const mongo_id = useSelector((state) => state.mongo_id);
 
+    const [lastRefresh, setLastRefresh] = useState(0)
 
     useEffect(() => {
         getDeckTitles()
     }, [])
 
     useEffect(() => {
+        if (props.refresh_prop != lastRefresh) {
+            getDeckTitles()
+            setLastRefresh(props.refresh_prop)
+        }
+    })
+
+    useEffect(() => {
         getDeckTitles()
+        setLastRefresh(props.refresh_prop)
     }, [props.refresh_prop])
 
     function getDeckTitles() {
@@ -42,9 +51,7 @@ function EditLectureDeck(props) {
                 for (var i = 0; i < data.titles.length; i++) {
                     titles_uids.push([data.titles[i], data.uids[i]]) // push the deck titles and uids into the deckTitles list. 
                 }
-
                 setDeckTitles(titles_uids)
-                // console.log("Deck titles", titles_uids, "generated")
             })
     }
 

@@ -44,15 +44,13 @@ function Home() {
 
   //Axios request interceptor
   axios.interceptors.request.use(function (config) {
-    console.log("prepending bearer token to outgoing request.")
     config.headers.Authorization = `Bearer ${jwt_token}`
     return config;
   });
 
   useEffect(() => {
-    console.log("The jwt token is", jwt_token)
-    console.log("The mongo id is", mongo_id)
-
+    // console.log("The jwt token is", jwt_token)
+    // console.log("The mongo id is", mongo_id)
     window.setInterval(function () {
       updateTime();
     }, 1000);
@@ -114,7 +112,7 @@ function Home() {
                     <Popover.Title as="h3">Session Code</Popover.Title>
                     <Popover.Content>
                       <div className={styles.session_popup}>
-                        <input placeholder={"27"} value={sessionCode} onInput={(e) => { setSessionCode(e.target.value) }}></input>
+                        <input placeholder={"room id"} value={sessionCode} onInput={(e) => { setSessionCode(e.target.value) }}></input>
                         <button onClick={onSubmitCode}>submit</button>
                       </div>
                     </Popover.Content>

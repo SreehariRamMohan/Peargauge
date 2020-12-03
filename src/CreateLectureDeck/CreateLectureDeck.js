@@ -28,8 +28,7 @@ function CreateLectureDeck(props) {
     
     useEffect(() => {
         if (props.edit_deck_uid != "" && props.edit_deck_uid != deckId) {
-            console.log("Value of props.edit_deck_uid changed to ", props.edit_deck_uid)
-
+            // console.log("Value of props.edit_deck_uid changed to ", props.edit_deck_uid)
             // load the current deck for editing
             fetch_deck(props.edit_deck_uid)
         }
@@ -44,14 +43,9 @@ function CreateLectureDeck(props) {
             .then(res => { return res.data })
             .then(data => {
                 if (data.status == "success") {
-                    
-                    setTitle(data.deck.title)
-
-                    console.log("loading up the deck", data.deck.title)
-                    
+                    setTitle(data.deck.title)                    
                     //convert the list like format of the questions to a dictionary which we use internally. 
-                    
-                    //res.data.deck.questions
+        
                     let questionContent = {}
                     for (var i = 0; i < data.deck.questions.length; i++) {
                         questionContent[(parseInt(i)+1) + ""] = data.deck.questions[i]
@@ -59,7 +53,7 @@ function CreateLectureDeck(props) {
 
                     setQuestionContent(questionContent)
                     setDeckId(data.deck["_id"])
-
+                    setNumQuestions(data.deck.questions.length)
                 }
             })
     }
@@ -198,7 +192,6 @@ function CreateLectureDeck(props) {
         axios.post(URL + "/createDeck", payload) // This will also edit an existing deck 
             .then(res => { return res.data })
             .then(data => {
-                // console.log(data)
                 setSaving(false)
                 props.refresh()
             })

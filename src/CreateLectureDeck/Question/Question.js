@@ -40,8 +40,6 @@ function Question(props) {
     }
 
     function handleRadioChange(event) {
-        console.log("radio button status:", event.target.value)
-        
         let update = { ...props.questionStateDict }
         update["format"] = event.target.value
         props.updateFunction(props.questionNumber, update)

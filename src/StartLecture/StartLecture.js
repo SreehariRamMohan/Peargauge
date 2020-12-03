@@ -90,25 +90,15 @@ function StartLecture() {
     const [formattedChartData, setFormattedChartData] = useState(initialChartDataForQuestion)
 
     useEffect(() => {
-        console.log("API URL is", URL, "websocket URL is", WEBSOCKET_URL)
-        console.log("the socket is", socket)
+        // console.log("API URL is", URL, "websocket URL is", WEBSOCKET_URL)
         socket.on("connect", function () {
-            console.log("Connected: socket id is", socket.id)
             setTeacherSocketId(socket.id)
-
             // each teacher will join their own "unique" room so we can send back updates about student MC choices
             socket.emit("join", socket.id)
-            console.log("Teacher joining unique room " + socket.id)
+            // console.log("Teacher joining unique room " + socket.id)
         })
         socket.on("updateGuess", function (stats) {
-            console.log("receiving updated student stats:", stats)
             setAnswerData(stats)
-
-            // let chartDataNew = [...responseData]
-            // for (var i = 0; i < order.length; i++) {
-            //     chartDataNew[i].responses = stats[order[i]]
-            // }
-
             let update = { ...responseData }
 
             //case where we are going to a question for the first time
@@ -117,7 +107,6 @@ function StartLecture() {
             setResponseData(update)
 
             reformatDataForChart(update)
-            // console.log(chartDataNew)
         })
 
         getDeckTitles()
@@ -212,7 +201,6 @@ function StartLecture() {
             correct: "B"
             question: "6-2"
         */
-        console.log("trying to start lecture")
 
         //update current question in Redis, so if users join the session later, they are served with the current question.
         axios.post(URL + "/updateQuestion", payload)
@@ -227,9 +215,6 @@ function StartLecture() {
     }
 
     function startLecture() {
-
-        console.log("Start lecture called.")
-
         let payload = {
             "roomid": inputRoomId,
             "teacherSocketId": teacherSocketId,
@@ -244,7 +229,6 @@ function StartLecture() {
                 setLecturePending(true)
             })
 
-        console.log("started lecture")
     }
 
     function onClick(e, type) {
@@ -283,7 +267,6 @@ function StartLecture() {
                 return res.data
             })
             .then(data => {
-                console.log("received deck names", data)
                 setDeckTitles(data.titles)
                 setDeckUIDs(data.uids)
             })
@@ -293,7 +276,7 @@ function StartLecture() {
         if (type == "room") {
             setInputRoomId(event.target.value)
         } else if (type == "deck") {
-            console.log("deck index chosen", event.target.options.selectedIndex)
+            // console.log("deck index chosen", event.target.options.selectedIndex)
             setDeckTitleSelected(event.target.value)
             setDeckUIDSelected(deckUIDs[event.target.options.selectedIndex - 1])
             setQi(0) //reset the current question index we're on. 
@@ -314,9 +297,7 @@ function StartLecture() {
                 return res.data
             })
             .then(data => {
-                console.log("response from getDeck", data)
                 setDeckSelected(data["deck"])
-                console.log("Load deck finished, the deck we loaded was:", data["deck"])
             })
     }
 

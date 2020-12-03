@@ -38,21 +38,21 @@ function SamplePage() {
     useEffect(() => {
 
         socket.on("connect", function () {
-            console.log("socket connection made -->")
+            // console.log("socket connection made -->")
             socket.emit("join", id)
-            console.log("Client joining the room", id)
+            // console.log("Client joining the room", id)
         })
 
         socket.on("updateQuestion", function (question) {
-            console.log("Question received", question)
+            // console.log("Question received", question)
             setCurrentQuestion(question)
         })
 
         socket.on("initQuestion", function (question) {
-            console.log("here in init question question received is", question, "current question", currentQuestion)
+            // console.log("here in init question question received is", question, "current question", currentQuestion)
             if (Object.keys(currentQuestion).length == 0) {
                 setCurrentQuestion(question)
-                console.log("initializing first question with", question)
+                // console.log("initializing first question with", question)
             }
         })
 

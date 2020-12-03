@@ -20,14 +20,13 @@ function CreateEdit() {
     // called from the edit tab, transition to the create tab
     // pass along the deck uid, generate exisiting questions to allow for easy editing. 
     function edit_particular_deck(deck_uid) {
-        console.log("Switching tabs deck uid is", deck_uid )
         setDeckUID(deck_uid)
         setKey("create")
     }
 
     function refresh_edit_deck_screen() {
         setLastSavedTime(date.getTime())
-        console.log("time of save", date.getTime())
+        // console.log("updating refresh prop")
     }
 
 

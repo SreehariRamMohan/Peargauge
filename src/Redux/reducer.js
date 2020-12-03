@@ -44,7 +44,7 @@ export default function reducer(state = initialState, action) {
     }, state);
   
     const nextState = producer(state, action);
-    console.log("Redux action:", action, "Updated state:", nextState);
+    // console.log("Redux action:", action, "Updated state:", nextState);
     return nextState;
   }
   

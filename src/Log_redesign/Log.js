@@ -40,8 +40,6 @@ function Log() {
     const jwt_token = useSelector((state) => state.jwt_token);
 
     useEffect(() => {
-        console.log(`URL is ${URL}`)
-
         if (AUTO_LOG_IN) {
             onSubmit()
         }
@@ -95,7 +93,6 @@ function Log() {
     }
 
     function handleMouseMove(event) {
-        // console.log(event.clientX, ",", event.clientY)
         setX(event.clientX)
         setY(event.clientY)
     }
